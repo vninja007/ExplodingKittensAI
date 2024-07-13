@@ -11,13 +11,28 @@ class Player:
         self.hand = hand
     def inform(self, player, move, moveData):
         pass
-    def getMove(self):
+    def getMove(self, toDraw):
         #Return None = draw ONE card
         psbls = whatcaniplay(self.hand)+[None]
-        self.hand.remove(psbls[0])
+        random.shuffle(psbls)
+        if(psbls[0]):
+            self.hand.remove(psbls[0])
+            if(psbls[0][0]=='C'):
+                self.hand.remove(psbls[0])
         return psbls[0]
-    def cardDrawn(self):
-        pass
+    def cardDrawn(self,card):
+        if(card=='EXPL'):
+            if('DEF' not in self.hand):
+                return 0
+            else:
+                self.hand.remove('DEF')
+                return 1
+        else:
+            self.hand.append(card)
+            return 2
+    def getFavored(self):
+        return self.hand.pop(random.randrange(len(self.hand)))
+
     
 def whatcaniplay(deck):
     possible = []
@@ -34,6 +49,7 @@ def whatcaniplay(deck):
     if('C3' in mapping): possible += ['C3']*(len(mapping['C3'])//2)
     if('C4' in mapping): possible += ['C4']*(len(mapping['C4'])//2)
     if('C5' in mapping): possible += ['C5']*(len(mapping['C5'])//2)
+
     return possible
 
 def initDeck():
@@ -73,8 +89,47 @@ players = []
 initDeck()
 
 turn = 0
+victim = 1
+toDraw = 1
 # while len(players):
-#     pass
 
-print(players[0].getMove())
+print(players[0].hand)
+move = 'skibidi'
+while not turn:
+    move = players[0].getMove(1)
+    print(move)
+    print(players[0].hand)
+
+    if(not move):
+        safe = players[turn].cardDrawn(deck.pop())
+        if(not safe): players.pop(turn)
+        if(safe==1): deck.insert(random.randrange(len(deck)),'EXP')
+        turn += 1
+    elif(move=='ATK'):
+        toDraw = 2
+        turn += 1; turn %= PLAYERS
+    elif(move=='SKIP'):
+        turn += 1; turn %= PLAYERS
+    elif(move=='SHUF'):
+        random.shuffle(deck)
+    elif(move=='FVR'):
+        players[turn].hand.append((fvrcard:=players[victim].getFavored()))
+        print('favor got', fvrcard)
+    elif(move=='STF'):
+        players[turn].inform(turn,'STF',deck[:-4:-1])
+    elif(move[0]=='C'):
+        random.shuffle(players[victim].hand)
+        players[turn].hand.append((cccard:=players[victim].hand.pop()))
+        print('catcard got', cccard)
+    
+
+
+print(players[0].hand)
+
+
+
+
+pass
+
+# print(players[0].getMove())
 print(time.time()-ctic)
