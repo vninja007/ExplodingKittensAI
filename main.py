@@ -6,14 +6,14 @@ deck = []
 PLAYERS = 2
 
 class Player:
-    def __init__(self, hand):
+    def __init__(self, name, hand):
+        self.name = name
         self.hand = hand
     def inform(self, player, move, moveData):
         pass
     def getMove(self):
         #Return None = draw ONE card
         psbls = whatcaniplay(self.hand)+[None]
-        print(psbls, self.hand)
         self.hand.remove(psbls[0])
         return psbls[0]
     def cardDrawn(self):
@@ -63,7 +63,7 @@ def initDeck():
     random.shuffle(deck)
 
     for player in range(PLAYERS):
-        players.append(Player(playerdecks[player]))
+        players.append(Player(str(player),playerdecks[player]))
         random.shuffle(players[-1].hand)
 
 
@@ -71,13 +71,10 @@ def initDeck():
 playerdecks = [[('DEF')] for n in range(PLAYERS)] #0 = me, 1+ = AIs
 players = []
 initDeck()
+
+turn = 0
+# while len(players):
+#     pass
+
 print(players[0].getMove())
-
-
-
-
-
-
-
-
 print(time.time()-ctic)
