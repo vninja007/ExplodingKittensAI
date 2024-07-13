@@ -1,16 +1,28 @@
 import random
+import time; ctic = time.time()
 
 
 deck = []
 PLAYERS = 2
 
-class Card():
+class Card:
     def __init__(self, type):
         self.type = type
     def __str__(self):
         return self.type
     def __repr__(self):
         return self.type
+
+class Player:
+    def __init__(self, hand):
+        self.hand = hand
+    def inform(self, player, move, moveData):
+        pass
+    def getMove(self):
+        psbls = whatcaniplay(self.hand)
+        hand.remove(psbls[0])
+        return psbls[0]
+
 
 playerdecks = [[Card('DEF')] for n in range(PLAYERS)] #0 = me, 1+ = AIs
 
@@ -41,21 +53,13 @@ deck.extend([Card('DEF') for i in range(1+(PLAYERS<5))])
 deck.extend([Card('EXPL') for i in range(PLAYERS-1)])
 random.shuffle(deck)
 
-print(len(deck) + sum(len(i) for i in playerdecks))
+players = []
+for player in range(PLAYERS):
+    players.append(Player(playerdecks[player]))
+
+print(players)
 
 
-print(deck)
-print(len(deck))
-
-#Attack: 4
-#Skip: 4
-#Shuffle: 4
-#Favor: 4
-#STF: 5
-#Nope: 5
-#Defuse: n+2
-#Exploders: n-1
-#CatCard: 4 cards x 5 varieties
 
 
 def whatcaniplay(deck):
@@ -80,4 +84,4 @@ def whatcaniplay(deck):
     # if()
     print(possible)
 
-whatcaniplay(playerdecks[0])
+print(time.time()-ctic)
