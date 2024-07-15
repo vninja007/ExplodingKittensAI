@@ -6,9 +6,9 @@ class Player:
         self.hand = hand
     def inform(self, player, move, moveData):
         pass
-    def getMove(self, toDraw):
+    def getMove(self, toDraw,deckhandlens):
         #Return None = draw ONE card
-        psbls = whatcaniplay(self.hand)+[None]
+        psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
         random.shuffle(psbls)
         if(psbls[0]):
             self.hand.remove(psbls[0])
@@ -29,19 +29,19 @@ class Player:
         return self.hand.pop(random.randrange(len(self.hand)))
 
     
-def whatcaniplay(deck):
+def whatcaniplay(deck,name,deckhandlens):
     possible = []
     playerdeck = [str(card) for card in deck]
-    mapping = {card:{idx for idx in range(len(playerdeck)) if card==playerdeck[idx]} for card in playerdeck}
-    
-    if('ATK' in mapping): possible += ['ATK']*len(mapping['ATK']) 
-    if('SKIP' in mapping): possible += ['SKIP']*len(mapping['SKIP']) 
-    if('SHUF' in mapping): possible += ['SHUF']*len(mapping['SHUF']) 
-    if('FVR' in mapping): possible += ['FVR']*len(mapping['FVR']) 
-    if('STF' in mapping): possible += ['STF']*len(mapping['STF']) 
-    if('C1' in mapping): possible += ['C1']*(len(mapping['C1'])//2)
-    if('C2' in mapping): possible += ['C2']*(len(mapping['C2'])//2)
-    if('C3' in mapping): possible += ['C3']*(len(mapping['C3'])//2)
-    if('C4' in mapping): possible += ['C4']*(len(mapping['C4'])//2)
-    if('C5' in mapping): possible += ['C5']*(len(mapping['C5'])//2)
+    mapping = {card:playerdeck.count(card) for card in set(playerdeck)}
+    # print(mappign)
+    if('ATK' in mapping): possible += ['ATK']*mapping['ATK']
+    if('SKIP' in mapping): possible += ['SKIP']*mapping['SKIP']
+    if('SHUF' in mapping): possible += ['SHUF']*mapping['SHUF']
+    if('FVR' in mapping and deckhandlens[int(name)^1]): possible += ['FVR']*mapping['FVR']
+    if('STF' in mapping): possible += ['STF']*mapping['STF']
+    if('C1' in mapping and deckhandlens[int(name)^1]): possible += ['C1']*(mapping['C1']//2)
+    if('C2' in mapping and deckhandlens[int(name)^1]): possible += ['C2']*(mapping['C2']//2)
+    if('C3' in mapping and deckhandlens[int(name)^1]): possible += ['C3']*(mapping['C3']//2)
+    if('C4' in mapping and deckhandlens[int(name)^1]): possible += ['C4']*(mapping['C4']//2)
+    if('C5' in mapping and deckhandlens[int(name)^1]): possible += ['C5']*(mapping['C5']//2)
     return possible
