@@ -7,10 +7,9 @@ deck = []
 PLAYERS = 2
 
 zerowin = 0
-onewin = 1
+onewin = 0
 
 for _ in range(int(1e5)):
-
     def initDeck():
         deck.extend([('ATK') for i in range(4)])
         deck.extend([('SKIP') for i in range(4)])
@@ -56,7 +55,7 @@ for _ in range(int(1e5)):
     while toDraw and len(players)>1:
         move = 'skibidi'
         while move:
-            move = players[0].getMove(1)
+            move = players[turn].getMove(1,[len(i) for i in playerdecks])
             victim = turn^1
             if(not move): continue
             if(move=='ATK'):
@@ -67,18 +66,18 @@ for _ in range(int(1e5)):
             elif(move=='SHUF'):
                 random.shuffle(deck)
             elif(move=='FVR'):
-                try:
+                # try:/
                     players[turn].hand.append((fvrcard:=players[victim].getFavored()))
-                except:
-                    continue
+                # except:
+                #     continue
             elif(move=='STF'):
                 players[turn].inform(turn,'STF',deck[:-4:-1])
             elif(move[0]=='C'):
-                try:
+                # try:
                     random.shuffle(players[victim].hand)
                     players[turn].hand.append((cccard:=players[victim].hand.pop()))
-                except:
-                    continue
+                # except:
+                #     continue
         safe = players[turn].cardDrawn(deck.pop())
         if(not safe): players.pop(turn); toDraw = 1
         else:
