@@ -37,10 +37,6 @@ def initDeck(deck, playerdecks, players, PLAYERS):
         random.shuffle(players[-1].hand)
 
 
-
-
-
-
 # while len(players):
 
 
@@ -66,12 +62,12 @@ def simulateGame(PLAYERS):
             elif(move=='SHUF'):
                 random.shuffle(deck)
             elif(move=='FVR'):
-                players[turn].hand.append((fvrcard:=players[victim].getFavored()))
+                players[turn].hand.append(players[victim].getFavored())
             elif(move=='STF'):
                 players[turn].inform(turn,'STF',deck[:-4:-1])
             elif(move[0]=='C'):
-                random.shuffle(players[victim].hand)
-                players[turn].hand.append((cccard:=players[victim].hand.pop()))
+                cardtaken = random.choice(players[victim].hand)
+                players[turn].hand.append(players[victim].hand.remove(cardtaken))
         safe = players[turn].cardDrawn(deck.pop())
         if(not safe): players.pop(turn); toDraw = 1
         else:
@@ -89,7 +85,7 @@ def simulateGame(PLAYERS):
 
 onewin = 0
 zerowin = 0
-for _ in range(int(1e3)):
+for _ in range(int(3e3)):
     res = simulateGame(2)
     if(res=='1'): onewin += 1
     else: zerowin += 1
