@@ -6,17 +6,13 @@ class Player: #RandomPlayer
         self.hand = hand
     def inform(self, player, move, moveData):
         pass
-    def getMove(self, toDraw,deckhandlens):
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
         #Return None = draw ONE card
         psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
         chosenmove = random.choice(psbls)
-        # random.shuffle(psbls)
-        if(chosenmove):
-            self.hand.remove(chosenmove)
-            if(chosenmove[0]=='C'):
-                self.hand.remove(chosenmove)
+        # print(self.name, movectr, turnctr, chosenmove, self.hand)
         return chosenmove
-    def cardDrawn(self,card):
+    def cardDrawn(self,card): #THIS CANNOT BE OVERWRITTEN
         if(card=='EXPL'):
             if('DEF' not in self.hand):
                 return 0
@@ -28,6 +24,51 @@ class Player: #RandomPlayer
             return 2
     def getFavored(self):
         return self.hand.pop(random.randrange(len(self.hand)))
+
+class CommonSensePlayer(Player): #RandomPlayer
+    def __init__(self, name, hand):
+        self.name = name
+        self.hand = hand
+        self.movehistory = {}
+    def inform(self, player, move, moveData):
+        pass
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+        #Return None = draw ONE card
+        if(movectr not in self.movehistory): self.movehistory[movectr] = set()
+
+        psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
+        chosenmove = random.choice(psbls)
+
+        if('STF' in self.movehistory[movectr]):
+            while(chosenmove == 'STF'): 
+                # print('stf', chosenmove, self.hand)
+                chosenmove = random.choice(psbls)
+        if('SHUF' in self.movehistory[movectr]):
+            while(chosenmove == 'SHUF'): chosenmove = random.choice(psbls)
+        # print(self.name, movectr, turnctr, chosenmove, self.hand)
+        self.movehistory[movectr].add(chosenmove)
+        return chosenmove
+    def getFavored(self):
+        index = random.randrange(len(self.hand))
+        pickable = [i for i in self.hand if i!='DEF' and i!='FVR' and i!='NOPE']
+        if(not pickable):
+            if('NOPE' in self.hand): 
+                self.hand.remove('NOPE')
+                return 'NOPE'
+            if('FVR' in self.hand): 
+                self.hand.remove('FVR')
+                return 'FVR'
+            self.hand.remove('DEF')
+            return 'DEF'
+            
+            
+        chosen = pickable.pop(random.randrange(len(pickable)))
+        self.hand.remove(chosen)
+        return chosen
+        # return self.hand.pop(random.randrange(len(self.hand)))
+
+
+
 
     
 def whatcaniplay(deck,name,deckhandlens):

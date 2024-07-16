@@ -32,9 +32,23 @@ def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([('EXPL') for i in range(PLAYERS-1)])
     random.shuffle(deck)
 
-    for player in range(PLAYERS):
-        players.append(Player(str(player),playerdecks[player]))
-        random.shuffle(players[-1].hand)
+    players.append(Player(str(0),playerdecks[0]))
+    random.shuffle(players[-1].hand)
+    players.append(CommonSensePlayer(str(1),playerdecks[1]))
+    random.shuffle(players[-1].hand)
+
+
+    # players.append(CommonSensePlayer(str(0),playerdecks[0]))
+    # random.shuffle(players[-1].hand)
+    # players.append(Player(str(1),playerdecks[1]))
+    # random.shuffle(players[-1].hand)
+
+
+    # random.shuffle(players)
+
+    # for player in range(PLAYERS):
+    #     players.append(Player(str(player),playerdecks[player]))
+    #     random.shuffle(players[-1].hand)
 
 
 # while len(players):
@@ -46,29 +60,44 @@ def simulateGame(PLAYERS):
     players = []
     initDeck(deck, playerdecks, players, PLAYERS)
     turn = 0
+    turnctr = 0 #How mnay times moves "flip"
+    movectr = 0 # Number of ATK + SKIP + Cards Drawn
     victim = 1
     toDraw = 1
     while toDraw and len(players)>1:
         move = 'skibidi'
         while move:
-            move = players[turn].getMove(1,[len(i) for i in playerdecks])
+            move = players[turn].getMove(toDraw, movectr, turnctr, [len(i) for i in playerdecks])
+            if(move):
+                playerdecks[turn].remove(move)
+                if(move[0]=='C'):
+                    playerdecks[turn].remove(move)
             victim = turn^1
             if(not move): continue
             if(move=='ATK'):
                 toDraw = toDraw+1 if toDraw==1 else toDraw+2
                 turn += 1; turn %= PLAYERS
+                turnctr += 1
+                movectr += 1
             elif(move=='SKIP'):
                 turn += 1; turn %= PLAYERS
+                turnctr += 1
+                movectr += 1
             elif(move=='SHUF'):
                 random.shuffle(deck)
             elif(move=='FVR'):
-                players[turn].hand.append(players[victim].getFavored())
+                favorcard = players[victim].getFavored()
+                # print('favorcard', favorcard)
+                players[turn].hand.append(favorcard)
             elif(move=='STF'):
                 players[turn].inform(turn,'STF',deck[:-4:-1])
             elif(move[0]=='C'):
                 cardtaken = random.choice(players[victim].hand)
-                players[turn].hand.append(players[victim].hand.remove(cardtaken))
+                players[victim].hand.remove(cardtaken)
+                players[turn].hand.append(cardtaken)
+                # print('cardtaken', cardtaken)
         safe = players[turn].cardDrawn(deck.pop())
+        movectr += 1
         if(not safe): players.pop(turn); toDraw = 1
         else:
             if(safe==1): 
@@ -76,7 +105,7 @@ def simulateGame(PLAYERS):
                 else:
                     deck.insert(random.randrange(len(deck)),'EXPL')
             toDraw -= 1
-            if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1
+            if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
     return players[0].name
 
 # print(players[0].hand)
@@ -90,5 +119,5 @@ for _ in range(int(3e3)):
     if(res=='1'): onewin += 1
     else: zerowin += 1
 
-print(onewin, zerowin)
+print(zerowin, onewin)
 print(time.time()-ctic)
