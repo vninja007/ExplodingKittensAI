@@ -32,9 +32,9 @@ def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([('EXPL') for i in range(PLAYERS-1)])
     random.shuffle(deck)
 
-    players.append(Player(str(0),playerdecks[0]))
+    players.append(ARPlayer(str(0),playerdecks[0]))
     random.shuffle(players[-1].hand)
-    players.append(CommonSensePlayer(str(1),playerdecks[1]))
+    players.append(ARPlayer(str(1),playerdecks[1]))
     random.shuffle(players[-1].hand)
 
 
@@ -60,7 +60,7 @@ def simulateGame(PLAYERS):
     players = []
     initDeck(deck, playerdecks, players, PLAYERS)
     turn = 0
-    turnctr = 0 #How mnay times moves "flip"
+    turnctr = 0 # Number of cards drawn from deck
     movectr = 0 # Number of ATK + SKIP + Cards Drawn
     victim = 1
     toDraw = 1
@@ -74,6 +74,9 @@ def simulateGame(PLAYERS):
                     playerdecks[turn].remove(move)
             victim = turn^1
             if(not move): continue
+            for player in players:
+                player.inform(turn, move, victim if move=='FVR' or move[0]=='C' else None)
+
             if(move=='ATK'):
                 toDraw = toDraw+1 if toDraw==1 else toDraw+2
                 turn += 1; turn %= PLAYERS
@@ -114,10 +117,10 @@ def simulateGame(PLAYERS):
 
 onewin = 0
 zerowin = 0
-for _ in range(int(3e3)):
+for _ in range(int(1e4)):
     res = simulateGame(2)
     if(res=='1'): onewin += 1
     else: zerowin += 1
 
-print(zerowin, onewin)
+print(zerowin, onewin, onewin/(onewin+zerowin))
 print(time.time()-ctic)

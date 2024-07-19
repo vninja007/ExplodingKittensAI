@@ -24,8 +24,23 @@ class Player: #RandomPlayer
             return 2
     def getFavored(self):
         return self.hand.pop(random.randrange(len(self.hand)))
+    
+class ARPlayer(Player): #AlternateRandomPlayer
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+    #Return None = draw ONE card
+        
+        psbls = whatcaniplay(self.hand,self.name,deckhandlens)
+        if(not psbls):
+            return None
+        else:
+            playcard = random.randint(0,1)
+            if(not playcard):
+                return None
+            else:
+                return random.choice(psbls)
+        # chosenmove = random.choice(psbls)
 
-class CommonSensePlayer(Player): #RandomPlayer
+class CommonSensePlayer(Player): #CommonSensePlayer
     def __init__(self, name, hand):
         self.name = name
         self.hand = hand
