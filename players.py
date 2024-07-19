@@ -1,5 +1,10 @@
 import random
 
+randomlist = [int(i) for i in open('random256.txt').readlines()]
+startind = random.randint(0,len(randomlist)//10)
+
+
+
 class Player: #RandomPlayer
     def __init__(self, name, hand):
         self.name = name
@@ -25,19 +30,23 @@ class Player: #RandomPlayer
     def getFavored(self):
         return self.hand.pop(random.randrange(len(self.hand)))
     
+
+
 class ARPlayer(Player): #AlternateRandomPlayer
     def getMove(self, toDraw, movectr, turnctr, deckhandlens):
     #Return None = draw ONE card
-        
+        global startind
+        startind += 1; startind %= 100000
+        # print(startind)
         psbls = whatcaniplay(self.hand,self.name,deckhandlens)
         if(not psbls):
             return None
         else:
-            playcard = random.randint(0,1)
+            playcard = randomlist[startind]%2
             if(not playcard):
                 return None
             else:
-                return random.choice(psbls)
+                return psbls[randomlist[startind]%len(psbls)]
         # chosenmove = random.choice(psbls)
 
 class CommonSensePlayer(Player): #CommonSensePlayer
@@ -114,3 +123,6 @@ def whatcaniplay(deck,name,deckhandlens):
     # if('C4' in mapping and deckhandlens[int(name)^1]): possible += ['C4']*(mapping['C4']//2)
     # if('C5' in mapping and deckhandlens[int(name)^1]): possible += ['C5']*(mapping['C5']//2)
     return possible
+
+def LCG(x, a, c, m): #https://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf
+    return (a*x+c)%m
