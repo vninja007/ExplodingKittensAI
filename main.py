@@ -32,16 +32,16 @@ def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([('EXPL') for i in range(PLAYERS-1)])
     random.shuffle(deck)
 
-    players.append(ARPlayer(str(0),playerdecks[0]))
-    random.shuffle(players[-1].hand)
-    players.append(ARPlayer(str(1),playerdecks[1]))
-    random.shuffle(players[-1].hand)
+    # players.append(Player(str(0),playerdecks[0]))
+    # random.shuffle(players[-1].hand)
+    # players.append(RunningPlayer(str(1),playerdecks[1]))
+    # random.shuffle(players[-1].hand)
 
 
-    # players.append(CommonSensePlayer(str(0),playerdecks[0]))
-    # random.shuffle(players[-1].hand)
-    # players.append(Player(str(1),playerdecks[1]))
-    # random.shuffle(players[-1].hand)
+    players.append(RunningPlayer(str(0),playerdecks[0]))
+    random.shuffle(players[-1].hand)
+    players.append(Player(str(1),playerdecks[1]))
+    random.shuffle(players[-1].hand)
 
 
     # random.shuffle(players)
@@ -106,7 +106,7 @@ def simulateGame(PLAYERS):
             if(safe==1): 
                 if(not deck): deck = ['EXPL']
                 else:
-                    deck.insert(random.randrange(len(deck)),'EXPL')
+                    deck.insert(players[turn].reinsertEK(len(deck)),'EXPL')
             toDraw -= 1
             if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
     return players[0].name
@@ -122,5 +122,5 @@ for _ in range(int(1e4)):
     if(res=='1'): onewin += 1
     else: zerowin += 1
 
-print(zerowin, onewin, onewin/(onewin+zerowin))
+print(zerowin, onewin, onewin/(onewin+zerowin), zerowin/(onewin+zerowin))
 print(time.time()-ctic)

@@ -29,6 +29,9 @@ class Player: #RandomPlayer
             return 2
     def getFavored(self):
         return self.hand.pop(random.randrange(len(self.hand)))
+    def reinsertEK(self, decklen):
+        return random.randint(0, decklen)
+
     
 
 
@@ -90,6 +93,35 @@ class CommonSensePlayer(Player): #CommonSensePlayer
         self.hand.remove(chosen)
         return chosen
         # return self.hand.pop(random.randrange(len(self.hand)))
+
+class RunningPlayer(CommonSensePlayer):
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+        global startind
+        # startind += 1; startind %= 100000
+        # playcard = randomlist[startind]%2
+        # if(not playcard): return None
+        if(turnctr<15): return None
+        if(turnctr<35 and self.hand.count('DEF')): return None
+        # if(turnctr<20): return None
+        handset = set(self.hand)
+        if(movectr not in self.movehistory): self.movehistory[movectr] = set()
+
+        psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
+        chosenmove = random.choice(psbls)
+
+        if('STF' in self.movehistory[movectr]):
+            while(chosenmove == 'STF'): 
+                # print('stf', chosenmove, self.hand)
+                chosenmove = random.choice(psbls)
+        if('SHUF' in self.movehistory[movectr]):
+            while(chosenmove == 'SHUF'): chosenmove = random.choice(psbls)
+        # print(self.name, movectr, turnctr, chosenmove, self.hand)
+        self.movehistory[movectr].add(chosenmove)
+        return chosenmove
+    
+    def reinsertEK(self, decklen):
+        return 1
+
 
 
 
