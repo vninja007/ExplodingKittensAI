@@ -4,8 +4,6 @@ import time; ctic = time.time()
 
 
 
-
-
 def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([('ATK') for i in range(4)])
     deck.extend([('SKIP') for i in range(4)])
@@ -22,6 +20,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
 
     random.shuffle(deck)
+    # deck = selfshuffle(deck)
 
     for player in playerdecks:
         for i in range(7):
@@ -30,7 +29,9 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
     deck.extend([('DEF') for i in range(1+(PLAYERS<5))])
     deck.extend([('EXPL') for i in range(PLAYERS-1)])
+
     random.shuffle(deck)
+    # deck = selfshuffle(deck)
 
     # players.append(Player(str(0),playerdecks[0]))
     # random.shuffle(players[-1].hand)
@@ -40,8 +41,10 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
     players.append(RunningPlayer(str(0),playerdecks[0]))
     random.shuffle(players[-1].hand)
-    players.append(Player(str(1),playerdecks[1]))
+    # players[-1].hand = selfshuffle(players[-1].hand)
+    players.append(CommonSensePlayer(str(1),playerdecks[1]))
     random.shuffle(players[-1].hand)
+    # players[-1].hand = selfshuffle(players[-1].hand)
 
 
     # random.shuffle(players)
@@ -115,12 +118,13 @@ def simulateGame(PLAYERS):
 # print("Player",players[0].name,"won by",players[0].hand.count('DEF'),'defuses')
 # print(players[0].getMove())
 
-onewin = 0
-zerowin = 0
-for _ in range(int(1e4)):
-    res = simulateGame(2)
-    if(res=='1'): onewin += 1
-    else: zerowin += 1
+if __name__ == '__main__':
+    onewin = 0
+    zerowin = 0
+    for _ in range(int(1e4)):
+        res = simulateGame(2)
+        if(res=='1'): onewin += 1
+        else: zerowin += 1
 
-print(zerowin, onewin, onewin/(onewin+zerowin), zerowin/(onewin+zerowin))
-print(time.time()-ctic)
+    print(zerowin, onewin, onewin/(onewin+zerowin), zerowin/(onewin+zerowin))
+    print(time.time()-ctic)

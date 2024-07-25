@@ -107,6 +107,11 @@ class RunningPlayer(CommonSensePlayer):
         if(movectr not in self.movehistory): self.movehistory[movectr] = set()
 
         psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
+        catcards = [i for i in psbls if type(i)==str and i[0]=='C']
+        if(catcards): return catcards[0]
+
+        
+
         chosenmove = random.choice(psbls)
 
         if('STF' in self.movehistory[movectr]):
