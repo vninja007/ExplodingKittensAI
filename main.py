@@ -2,56 +2,43 @@ import random
 from players import *
 import time; ctic = time.time()
 
+#Deck Structure
 
+
+#[DEF, NOPE, ATK, SKIP, FVR, SHUF, STF, C1, C2, C3, C4, C5]
+#[0.   1,    2,   3,    4,   5,    6,   7,  8,  9, 10, 11]
+
+#EXPL = -1
 
 def initDeck(deck, playerdecks, players, PLAYERS):
-    deck.extend([('ATK') for i in range(4)])
-    deck.extend([('SKIP') for i in range(4)])
-    deck.extend([('SHUF') for i in range(4)])
-    deck.extend([('FVR') for i in range(4)])
-    deck.extend([('STF') for i in range(5)])
-    deck.extend([('NOPE') for i in range(5)])
+    deck.extend([1 for i in range(5)])
+    deck.extend([2 for i in range(4)])
+    deck.extend([3 for i in range(4)])
+    deck.extend([4 for i in range(4)])
+    deck.extend([5 for i in range(4)])
+    deck.extend([6 for i in range(5)])
 
-    deck.extend([('C1') for i in range(4)])
-    deck.extend([('C2') for i in range(4)])
-    deck.extend([('C3') for i in range(4)])
-    deck.extend([('C4') for i in range(4)])
-    deck.extend([('C5') for i in range(4)])
+    deck.extend([7 for i in range(4)])
+    deck.extend([8 for i in range(4)])
+    deck.extend([9 for i in range(4)])
+    deck.extend([10 for i in range(4)])
+    deck.extend([11 for i in range(4)])
 
 
     random.shuffle(deck)
     # deck = selfshuffle(deck)
-
+    # print(playerdecks)
     for player in playerdecks:
         for i in range(7):
-            player.append(deck.pop())
+            player[deck.pop()]+=1
 
 
-    deck.extend([('DEF') for i in range(1+(PLAYERS<5))])
-    deck.extend([('EXPL') for i in range(PLAYERS-1)])
+    deck.extend([0 for i in range(1+(PLAYERS<5))])
+    deck.extend([-1 for i in range(PLAYERS-1)])
 
     random.shuffle(deck)
-    # deck = selfshuffle(deck)
-
-    # players.append(Player(str(0),playerdecks[0]))
-    # random.shuffle(players[-1].hand)
-    # players.append(RunningPlayer(str(1),playerdecks[1]))
-    # random.shuffle(players[-1].hand)
-
-
-    players.append(RunningPlayer(str(0),playerdecks[0]))
-    random.shuffle(players[-1].hand)
-    # players[-1].hand = selfshuffle(players[-1].hand)
-    players.append(CommonSensePlayer(str(1),playerdecks[1]))
-    random.shuffle(players[-1].hand)
-    # players[-1].hand = selfshuffle(players[-1].hand)
-
-
-    # random.shuffle(players)
-
-    # for player in range(PLAYERS):
-    #     players.append(Player(str(player),playerdecks[player]))
-    #     random.shuffle(players[-1].hand)
+    players.append(Player(0,playerdecks[0]))
+    players.append(Player(1,playerdecks[1]))
 
 
 # while len(players):
@@ -59,7 +46,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
 def simulateGame(PLAYERS):
     deck = []
-    playerdecks = [[('DEF')] for n in range(PLAYERS)] #0 = me, 1+ = AIs
+    playerdecks = [[1]+[0]*11 for n in range(PLAYERS)] #0 = me, 1+ = AIs
     players = []
     initDeck(deck, playerdecks, players, PLAYERS)
     turn = 0
@@ -71,45 +58,55 @@ def simulateGame(PLAYERS):
         move = 'skibidi'
         while move:
             move = players[turn].getMove(toDraw, movectr, turnctr, [len(i) for i in playerdecks])
+            
             if(move):
-                playerdecks[turn].remove(move)
-                if(move[0]=='C'):
-                    playerdecks[turn].remove(move)
+                playerdecks[turn][move] -= 1
+                if(move>=7):
+                    playerdecks[turn][move] -= 1
             victim = turn^1
+            print('turn', turn, playerdecks[0], playerdecks[1], 'np0', players[0].numPlayable, 'np1', players[1].numPlayable, 'lendeck', len(deck), 'move', move)
+            
             if(not move): continue
-            for player in players:
-                player.inform(turn, move, victim if move=='FVR' or move[0]=='C' else None)
+            # for player in players:
+            #     player.inform(turn, move, victim if move==4 or move>=7 else None)
 
-            if(move=='ATK'):
+            if(move==2):
                 toDraw = toDraw+1 if toDraw==1 else toDraw+2
                 turn += 1; turn %= PLAYERS
                 turnctr += 1
                 movectr += 1
-            elif(move=='SKIP'):
+            elif(move==3):
                 turn += 1; turn %= PLAYERS
                 turnctr += 1
                 movectr += 1
-            elif(move=='SHUF'):
-                random.shuffle(deck)
-            elif(move=='FVR'):
+            elif(move==4):
                 favorcard = players[victim].getFavored()
                 # print('favorcard', favorcard)
-                players[turn].hand.append(favorcard)
-            elif(move=='STF'):
-                players[turn].inform(turn,'STF',deck[:-4:-1])
-            elif(move[0]=='C'):
-                cardtaken = random.choice(players[victim].hand)
-                players[victim].hand.remove(cardtaken)
-                players[turn].hand.append(cardtaken)
+                players[turn].hand[favorcard] += 1 
+                players[turn].inform(turn, move, {'victim': victim, 'cardtaken': favorcard})
+            elif(move==5):
+                random.shuffle(deck)
+            elif(move==6):
+                players[turn].inform(turn,6,deck[:-4:-1])
+            elif(move>=7):
+                cardtaken = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=players[victim].hand, k=1)[0]
                 # print('cardtaken', cardtaken)
-        safe = players[turn].cardDrawn(deck.pop())
+                players[victim].hand[cardtaken] -= 1
+                players[turn].hand[cardtaken] += 1
+
+                players[victim].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
+                players[turn].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
+
+        nextcard = deck.pop()
+        print('nextcard', nextcard)
+        safe = players[turn].cardDrawn(nextcard)
         movectr += 1
         if(not safe): players.pop(turn); toDraw = 1
         else:
             if(safe==1): 
-                if(not deck): deck = ['EXPL']
+                if(not deck): deck = [-1]
                 else:
-                    deck.insert(players[turn].reinsertEK(len(deck)),'EXPL')
+                    deck.insert(players[turn].reinsertEK(len(deck)),-1)
             toDraw -= 1
             if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
     return players[0].name
@@ -121,7 +118,7 @@ def simulateGame(PLAYERS):
 if __name__ == '__main__':
     onewin = 0
     zerowin = 0
-    for _ in range(int(1e4)):
+    for _ in range(int(1e0)):
         res = simulateGame(2)
         if(res=='1'): onewin += 1
         else: zerowin += 1
