@@ -11,19 +11,20 @@ import time; ctic = time.time()
 #EXPL = -1
 
 def initDeck(deck, playerdecks, players, PLAYERS):
-    deck.extend([1 for i in range(5)])
-    deck.extend([2 for i in range(4)])
-    deck.extend([3 for i in range(4)])
-    deck.extend([4 for i in range(4)])
-    deck.extend([5 for i in range(4)])
-    deck.extend([6 for i in range(5)])
+    # deck.extend([1 for i in range(5)])
+    # deck.extend([2 for i in range(4)])
+    # deck.extend([3 for i in range(4)])
+    # deck.extend([4 for i in range(4)])
+    # deck.extend([5 for i in range(4)])
+    # deck.extend([6 for i in range(5)])
 
-    deck.extend([7 for i in range(4)])
-    deck.extend([8 for i in range(4)])
-    deck.extend([9 for i in range(4)])
-    deck.extend([10 for i in range(4)])
-    deck.extend([11 for i in range(4)])
+    # deck.extend([7 for i in range(4)])
+    # deck.extend([8 for i in range(4)])
+    # deck.extend([9 for i in range(4)])
+    # deck.extend([10 for i in range(4)])
+    # deck.extend([11 for i in range(4)])
 
+    # deck = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
 
     random.shuffle(deck)
     # deck = selfshuffle(deck)
@@ -45,7 +46,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
 
 def simulateGame(PLAYERS):
-    deck = []
+    deck = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
     playerdecks = [[1]+[0]*11 for n in range(PLAYERS)] #0 = me, 1+ = AIs
     players = []
     initDeck(deck, playerdecks, players, PLAYERS)
@@ -100,7 +101,7 @@ def simulateGame(PLAYERS):
                 players[turn].hand[cardtaken] += 1
                 players[turn].numCards += 1
                 players[turn].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
-
+        # print(deck)
         nextcard = deck.pop()
         # print('nextcard', nextcard)
         safe = players[turn].cardDrawn(nextcard)
