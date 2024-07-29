@@ -1,6 +1,6 @@
 import random
-import numpy
-rng = numpy.random.default_rng()
+import numpy as np
+rng = np.random.default_rng()
 
 # randomlist = [int(i) for i in open('random256.txt').readlines()]
 # startind = random.randint(0,len(randomlist)//10)
@@ -56,7 +56,7 @@ class Player: #RandomPlayer
         elif(togiveaway >= 7 and self.hand[togiveaway]%2==1): self.numPlayable -= 1
         return togiveaway
     def reinsertEK(self, decklen):
-        return random.randint(0, decklen)
+        return int(random.random()*(decklen+1))
 
     
 
@@ -165,7 +165,12 @@ class Player: #RandomPlayer
 #         return 1
 
 
-
+def weighted_random_choice(choices, weights):
+    cum_weights = np.cumsum(weights)
+    total_weight = cum_weights[-1]
+    rand_val = np.random.rand() * total_weight
+    idx = np.searchsorted(cum_weights, rand_val)
+    return choices[idx]
 
 
     
@@ -173,7 +178,7 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
     
     if(numPlayable == 0): return None
     # print(numPlayable, deck, deckhandlens)
-    if(includeNone and not random.randint(0,numPlayable)): return None
+    if(includeNone and not int(random.random()*(numPlayable+1))): return None
     if(victim == None): victim = int(name)^1
 
     possible = list(deck)
@@ -189,6 +194,7 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
     if(possible==[0]*12): return None
     numbers = [0,1,2,3,4,5,6,7,8,9,10,11]
 
+    # return weighted_random_choice(numbers, possible)
     return random.choices(numbers, weights=possible, k=1)[0]
 
 def LCG(x, a, c, m): #https://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf
