@@ -26,7 +26,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
     # deck = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
 
-    random.shuffle(deck)
+    rng.shuffle(deck)
     # deck = selfshuffle(deck)
     # print(playerdecks)
     for player in playerdecks:
@@ -37,7 +37,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([0 for i in range(1+(PLAYERS<5))])
     deck.extend([-1 for i in range(PLAYERS-1)])
 
-    random.shuffle(deck)
+    rng.shuffle(deck)
     players.append(Player(0,playerdecks[0]))
     players.append(Player(1,playerdecks[1]))
 
@@ -89,7 +89,7 @@ def simulateGame(PLAYERS):
                 players[turn].numCards += 1
                 players[turn].inform(turn, move, {'victim': victim, 'cardtaken': favorcard})
             elif(move==5):
-                random.shuffle(deck)
+                rng.shuffle(deck)
             elif(move==6):
                 players[turn].inform(turn,6,deck[:-4:-1])
             elif(move>=7):

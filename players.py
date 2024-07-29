@@ -1,7 +1,9 @@
 import random
+import numpy
+rng = numpy.random.default_rng()
 
-randomlist = [int(i) for i in open('random256.txt').readlines()]
-startind = random.randint(0,len(randomlist)//10)
+# randomlist = [int(i) for i in open('random256.txt').readlines()]
+# startind = random.randint(0,len(randomlist)//10)
 
 
 
