@@ -1,7 +1,7 @@
 import random
 
-randomlist = [int(i) for i in open('random256.txt').readlines()]
-startind = random.randint(0,len(randomlist)//10)
+# randomlist = [int(i) for i in open('random256.txt').readlines()]
+# startind = random.randint(0,len(randomlist)//10)
 
 
 
@@ -53,8 +53,8 @@ class Player: #RandomPlayer
         if(2 <= togiveaway <= 6): self.numPlayable -= 1
         elif(togiveaway >= 7 and self.hand[togiveaway]%2==1): self.numPlayable -= 1
         return togiveaway
-    def reinsertEK(self, decklen):
-        return random.randint(0, decklen)
+    def reinsertEK(self, deckstart, decklen):
+        return random.randint(deckstart, decklen)
 
     
 

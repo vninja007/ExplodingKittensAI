@@ -1,6 +1,11 @@
-import random
+# import random
 from players import *
 import time; ctic = time.time()
+import numpy as np
+
+rng = np.random.default_rng()    # you can pass seed
+# rng.choice(...) 
+
 
 #Deck Structure
 
@@ -11,6 +16,7 @@ import time; ctic = time.time()
 #EXPL = -1
 
 def initDeck(deck, playerdecks, players, PLAYERS):
+    curat = 0
     # deck.extend([1 for i in range(5)])
     # deck.extend([2 for i in range(4)])
     # deck.extend([3 for i in range(4)])
@@ -26,35 +32,43 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
     # deck = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
 
-    random.shuffle(deck)
+    rng.shuffle(deck)
     # deck = selfshuffle(deck)
     # print(playerdecks)
     for player in playerdecks:
         for i in range(7):
-            player[deck.pop()]+=1
+            player[deck[curat]]+=1
+            deck[curat] = -9
+            curat += 1
+    deck = deck[curat:]
 
+    deck = np.concatenate((deck, np.asarray([0]*(1+(PLAYERS<5))), np.asarray([-1]*(PLAYERS-1))))
 
-    deck.extend([0 for i in range(1+(PLAYERS<5))])
-    deck.extend([-1 for i in range(PLAYERS-1)])
+    # deck.extend([0 for i in range(1+(PLAYERS<5))])
+    # deck.extend([-1 for i in range(PLAYERS-1)])
 
-    random.shuffle(deck)
+    rng.shuffle(deck)
     players.append(Player(0,playerdecks[0]))
     players.append(Player(1,playerdecks[1]))
+    return deck
+
 
 
 # while len(players):
 
 
 def simulateGame(PLAYERS):
-    deck = [1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
-    playerdecks = [[1]+[0]*11 for n in range(PLAYERS)] #0 = me, 1+ = AIs
+    deck = np.asarray([1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11], dtype=np.int8)
+
+    playerdecks = [np.asarray([1]+[0]*11,dtype=np.int8) for n in range(PLAYERS)] #0 = me, 1+ = AIs
     players = []
-    initDeck(deck, playerdecks, players, PLAYERS)
+    deck = initDeck(deck, playerdecks, players, PLAYERS)
     turn = 0
     turnctr = 0 # Number of cards drawn from deck
     movectr = 0 # Number of ATK + SKIP + Cards Drawn
     victim = 1
     toDraw = 1
+    curat = 0
     while toDraw and len(players)>1:
         move = 'skibidi'
         while move:
@@ -89,7 +103,8 @@ def simulateGame(PLAYERS):
                 players[turn].numCards += 1
                 players[turn].inform(turn, move, {'victim': victim, 'cardtaken': favorcard})
             elif(move==5):
-                random.shuffle(deck)
+                # random.shuffle(deck)
+                rng.shuffle(deck)
             elif(move==6):
                 players[turn].inform(turn,6,deck[:-4:-1])
             elif(move>=7):
@@ -102,18 +117,23 @@ def simulateGame(PLAYERS):
                 players[turn].numCards += 1
                 players[turn].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
         # print(deck)
-        nextcard = deck.pop()
+        print(curat, deck[curat], deck)
+        nextcard = deck[curat]
+        
         # print('nextcard', nextcard)
         safe = players[turn].cardDrawn(nextcard)
         movectr += 1
-        if(not safe): players.pop(turn); toDraw = 1
+        if(not safe): players.pop(turn); toDraw = 1; deck[curat] = -9; curat += 1
         else:
-            if(safe==1): 
-                if(not deck): deck = [-1]
-                else:
-                    deck.insert(players[turn].reinsertEK(len(deck)),-1)
+            if(safe==1):
+                deck = deck.tolist()
+                insertat = players[turn].reinsertEK(curat,len(deck)-1)
+                deck.pop(curat)
+                deck.insert(insertat)
+                deck = np.array(deck)
+
             toDraw -= 1
-            if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
+            if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1; deck[curat] = -9; curat += 1
     return players[0].name
 
 # print(players[0].hand)
