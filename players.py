@@ -100,17 +100,28 @@ class RunningPlayer(CommonSensePlayer):
         # startind += 1; startind %= 100000
         # playcard = randomlist[startind]%2
         # if(not playcard): return None
-        if(turnctr<15): return None
+        # if(turnctr<15): return None
         if(turnctr<35 and self.hand.count('DEF')): return None
         # if(turnctr<20): return None
         handset = set(self.hand)
         if(movectr not in self.movehistory): self.movehistory[movectr] = set()
 
         psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
-        catcards = [i for i in psbls if type(i)==str and i[0]=='C']
-        if(catcards): return catcards[0]
+        if('FVR' in psbls): return 'FVR'
+        if('C1' in psbls): return 'C1'
+        if('C2' in psbls): return 'C2'
+        if('C3' in psbls): return 'C3'
+        if('C4' in psbls): return 'C4'
+        if('C5' in psbls): return 'C5'
 
-        
+        if(toDraw > 1 and 'ATK' in psbls): return 'ATK'
+        if(toDraw>1 and 'SKIP' in psbls): return 'SKIP'
+        if(movectr>40 and 'ATK' in psbls): return 'ATK'
+        if(movectr>40 and 'SKIP' in psbls): return 'SKIP'
+        # catcards = [i for i in psbls if type(i)==str and i[0]=='C']
+        # if(catcards): return catcards[0]
+
+
 
         chosenmove = random.choice(psbls)
 
