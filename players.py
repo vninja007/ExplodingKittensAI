@@ -9,7 +9,7 @@ class Player: #RandomPlayer
     def __init__(self, name, hand):
         self.name = name
         self.numPlayable = sum(hand[2:7]) + sum([hand[i]//2 for i in range(7,12)])
-        # self.numCards = 8
+        self.numCards = 8
         self.hand = hand
     def inform(self, player, move, moveData):
         if(player!=self.name and move>=7 and moveData['victim']==int(self.name)):
@@ -27,6 +27,7 @@ class Player: #RandomPlayer
         #Return None = draw ONE card
         chosenmove = giveRandomMove(self.hand,self.name,deckhandlens, self.numPlayable)
         if(chosenmove!=None): self.numPlayable -= 1
+        # print('moving!', self.name, chosenmove)
         return chosenmove
     def cardDrawn(self,card): #THIS CANNOT BE OVERWRITTEN
         if(card==-1):
@@ -34,9 +35,11 @@ class Player: #RandomPlayer
                 return 0
             else:
                 self.hand[0] -= 1
+                self.numCards -= 1
                 return 1
         else:
             self.hand[card] += 1
+            self.numCards += 1
             if(card >= 7): #catcard
                 if(self.hand[card]%2==0):
                     self.numPlayable += 1
@@ -46,6 +49,7 @@ class Player: #RandomPlayer
     def getFavored(self):
         togiveaway = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=self.hand, k=1)[0]
         self.hand[togiveaway] -= 1
+        self.numCards -= 1
         if(2 <= togiveaway <= 6): self.numPlayable -= 1
         elif(togiveaway >= 7 and self.hand[togiveaway]%2==1): self.numPlayable -= 1
         return togiveaway
@@ -166,7 +170,7 @@ class Player: #RandomPlayer
 def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True):
     
     if(numPlayable == 0): return None
-    print(numPlayable, deck)
+    # print(numPlayable, deck, deckhandlens)
     if(includeNone and not random.randint(0,numPlayable)): return None
     if(victim == None): victim = int(name)^1
 
