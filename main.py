@@ -58,7 +58,7 @@ def simulateGame(PLAYERS):
     while toDraw and len(players)>1:
         move = 'skibidi'
         while move:
-            move = players[turn].getMove(toDraw, movectr, turnctr, [i.numCards for i in players])
+            move = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards])
             
             if(move):
                 players[turn].numCards -= 1

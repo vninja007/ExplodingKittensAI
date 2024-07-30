@@ -57,6 +57,7 @@ class Player: #RandomPlayer
         return togiveaway
     def reinsertEK(self, decklen):
         return int(random.random()*(decklen+1))
+        # return random.randint(0,decklen)
 
     
 
@@ -179,6 +180,8 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
     if(numPlayable == 0): return None
     # print(numPlayable, deck, deckhandlens)
     if(includeNone and not int(random.random()*(numPlayable+1))): return None
+    # if(includeNone and not random.randint(0,numPlayable)): return None
+    
     if(victim == None): victim = int(name)^1
 
     possible = list(deck)
