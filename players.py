@@ -182,17 +182,24 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
     if(includeNone and not int(random.random()*(numPlayable+1))): return None
     # if(includeNone and not random.randint(0,numPlayable)): return None
     
-    if(victim == None): victim = int(name)^1
+    if(victim == None): victim = 1 if int(name)==0 else 0
 
     possible = list(deck)
     possible[0] = 0
     possible[1] = 0
-    possible[4] = possible[4] if deckhandlens[victim] else 0
-    possible[7] = possible[7]//2 if deckhandlens[victim] else 0
-    possible[8] = possible[8]//2 if deckhandlens[victim] else 0
-    possible[9] = possible[9]//2 if deckhandlens[victim] else 0
-    possible[10] = possible[10]//2 if deckhandlens[victim] else 0
-    possible[11] = possible[11]//2 if deckhandlens[victim] else 0
+    if deckhandlens[victim]:
+        possible[7] = possible[7]//2
+        possible[8] = possible[8]//2
+        possible[9] = possible[9]//2
+        possible[10] = possible[10]//2
+        possible[11] = possible[11]//2
+    else:
+        possible[4] = 0
+        possible[7] = 0
+        possible[8] = 0
+        possible[9] = 0
+        possible[10] = 0
+        possible[11] = 0
 
     if(possible==[0]*12): return None
     numbers = [0,1,2,3,4,5,6,7,8,9,10,11]
