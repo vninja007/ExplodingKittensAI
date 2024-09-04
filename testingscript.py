@@ -9,6 +9,7 @@ Original file is located at
 
 import time
 ctic = time.time()
+import os
 import gymnasium as gym
 import math
 import random
@@ -23,10 +24,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from inputimeout import inputimeout, TimeoutOccurred
 
-TESTING = False
-i_episode = 5000
-ver = '03'
-
+TESTING = True
 
 # env = gym.make("CartPole-v1")
 env = ExplodingKittensEnv()
@@ -106,9 +104,6 @@ n_observations = len(state)
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
 
-if(i_episode):
-    policy_net.load_state_dict(torch.load(f'./{ver}_policy_net_{i_episode}'))
-    target_net.load_state_dict(torch.load(f'./{ver}_target_net_{i_episode}'))
 target_net.load_state_dict(policy_net.state_dict())
 
 optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
@@ -238,11 +233,15 @@ if torch.cuda.is_available() or torch.backends.mps.is_available():
 else:
     num_episodes = 50
 
-allrwds = []
-outcomes = []
 
-try:
-    while True:
+for modeldir in [i for i in os.listdir('.') if i[1] in {*'345'} and 'policy' in i and i not in ''.join(open('results.txt'))] :
+    win = 0
+    total = 0
+    policyat = modeldir
+    targetat = modeldir.replace('policy','target')
+    policy_net.load_state_dict(torch.load(policyat))
+    target_net.load_state_dict(torch.load(targetat))
+    for _ in range(int(160)):
         tic = time.time()
         # Initialize the environment and get its state
         state = env.reset()
@@ -270,8 +269,12 @@ try:
             memory.push(state, action, next_state, reward)
 
             if(terminated):
-                allrwds.append(reward)
-                outcomes.append(whowon)
+                if(int(whowon)==0):
+                    win += 1
+                total += 1
+                print(policyat, win/total*100, _)
+                # allrwds.append(reward)
+                # outcomes.append(whowon)
                 # print(whowon)
 
             # print
@@ -294,18 +297,5 @@ try:
                 episode_durations.append(t + 1)
                 # plot_durations()
                 break
-        print(i_episode, 'winrate', outcomes[-100:].count(0)/len(outcomes[-100:]), 'Games/sec', 1/(time.time()-tic+.001), 'lastoutcome', outcomes[-1])
-        i_episode += 1
-        # print('Games Per Second', )
-        if(i_episode%1000==0):
-            torch.save(target_net_state_dict, f'./{ver}_target_net_{i_episode}')
-            torch.save(policy_net_state_dict, f'./{ver}_policy_net_{i_episode}')
-
-except KeyboardInterrupt:
-    print('Complete')
-    print('Total time', time.time()-ctic)
-    torch.save(target_net_state_dict, f'./{ver}_target_net')
-    torch.save(policy_net_state_dict, f'./{ver}_policy_net')
-    plot_durations(show_result=True)
-    plt.ioff()
-    plt.show()
+    with open('results.txt', 'a+') as wfile:
+        wfile.write(f'{policyat} {win/total*100}\n')
