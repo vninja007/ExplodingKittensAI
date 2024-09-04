@@ -9,7 +9,11 @@
             "type": "python",
             "request": "launch",
             "module": "cProfile",
-            "args": ["-o", "C:/Users/pytho/Documents/Dev/tmp.prof", "${file}"]
+            "args": [
+                "-o",
+                "C:/Users/pytho/Documents/Dev/ExplodingKittensAI/tmp.prof",
+                "${file}"
+            ]
         },
         {
             "name": "Python: Current File",

@@ -25,12 +25,12 @@ def initDeck(PLAYERS):
         return deck, me, op
     else:
         raise NotImplementedError
+
+def getPossibleMoves(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True):
     
-def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True):
-    
-    if(numPlayable == 0): return None
+    if(numPlayable == 0): return [0]*12
     # print(numPlayable, deck, deckhandlens)
-    if(includeNone and not int(random.random()*(numPlayable+1))): return None
+    if(includeNone and not int(random.random()*(numPlayable+1))): return [0]*12
     # if(includeNone and not random.randint(0,numPlayable)): return None
     
     if(victim == None): victim = 1 if int(name)==0 else 0
@@ -51,6 +51,12 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
         possible[9] = 0
         possible[10] = 0
         possible[11] = 0
+    
+
+    return possible
+
+def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True):
+    possible = getPossibleMoves(deck,name,deckhandlens,numPlayable,victim,includeNone)
 
     if(possible==[0]*12): return None
     numbers = [0,1,2,3,4,5,6,7,8,9,10,11]
@@ -134,7 +140,7 @@ class ExplodingKittensEnv(gym.Env):
         
 
         #Number of possible outputs
-        self.action_space = spaces.Discrete(11) #n-1, 0 = Take Card
+        self.action_space = spaces.Discrete(11) #n-1, 0 = Take Card, n = n+1
         
         
         #Number of possible inputs
@@ -164,6 +170,9 @@ class ExplodingKittensEnv(gym.Env):
         self.done = False
 
     def _process_move(self, turn, move):
+        # print('movemake!', turn, move)
+        if not move:
+            move = 0
         # move = self.players[turn].getMove(self.toDraw, self.movectr, self.turnctr, [self.players[0].numCards, self.players[1].numCards])
         turn %= 2
         if(move):
@@ -227,7 +236,7 @@ class ExplodingKittensEnv(gym.Env):
     
     def doEvaluation(self,winner):
         result = 0
-        result = result+100 if winner==self.me else result-100
+        result = result+1000 if winner==self.me else result-1000
         result += 5*(self.players[self.me].hand[0] - self.players[self.op].hand[0])
         result += 2*(self.players[self.me].hand[2] - self.players[self.op].hand[2])
         result += (self.players[self.me].hand[3] - self.players[self.op].hand[3])
@@ -244,7 +253,7 @@ class ExplodingKittensEnv(gym.Env):
         res = self._process_move(self.me, move)
         if(res!=-1): return (res, self.doEvaluation(res))
         
-        opmove = self.players[0].getMove([self.players[0].numCards, self.players[1].numCards])
+        opmove = self.players[1].getMove([self.players[0].numCards, self.players[1].numCards])
         res = self._process_move(self.op,opmove)
         if(res!=-1): return (res, self.doEvaluation(res))
 
@@ -263,12 +272,13 @@ class ExplodingKittensEnv(gym.Env):
         # rewards are 0 when the player hits and is still below 21, and they
         # keep playing.
         rewards = 0 if type(status) != tuple else status[1]
+        whowon = -1 if type(status)!=tuple else status[0]
         
         # the state is represented as a player hand-value + dealer upcard pair.
         obs = self.players[self.me].hand + [len(self.deck)] + [self.toDraw,self.lastcard,self.lastcard2,self.lastcard3] + [len(self.players[self.op].hand)] + [self.movectr]
         # obs = np.array([player_value_obs, upcard_value_obs])
         
-        return obs, rewards, self.done, {}
+        return obs, rewards, self.done, {}, whowon
     
     def reset(self): # Changed
 

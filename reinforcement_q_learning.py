@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/9da0471a9eeb2351a488cd4b44fc6bbf/reinforcement_q_learning.ipynb
 """
 
+import time
+ctic = time.time()
 
 import gymnasium as gym
 import math
@@ -15,7 +17,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from collections import namedtuple, deque
 from itertools import count
-from ekenv import ExplodingKittensEnv
+from ekenv import ExplodingKittensEnv, getPossibleMoves
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -113,14 +115,36 @@ def select_action(state):
     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
         math.exp(-1. * steps_done / EPS_DECAY)
     steps_done += 1
+
+    # for _ in range(1):
     if sample > eps_threshold:
         with torch.no_grad():
             # t.max(1) will return the largest column value of each row.
             # second column on max result is index of where max element was
             # found, so we pick action with the larger expected reward.
-            return policy_net(state).max(1).indices.view(1, 1)
+            policyoutput = (policy_net(state))
+            
+            legalmoves = getPossibleMoves(env.players[0].hand,env.me,[env.players[0].numCards, env.players[1].numCards],env.players[0].numPlayable)
+            legalmoves = [1]+legalmoves[2:]
+            policyoutput = torch.where(torch.tensor(legalmoves,device='cuda') != 0, policyoutput, torch.tensor(float('-inf'),device='cuda'))
+            # print(policyoutput, '\n',policyoutput.argmax(1), env.players[0].hand, env.players[1].hand)
+            # input()
+            return policyoutput.max(1).indices.view(1, 1)
     else:
-        return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
+        legalmoves = getPossibleMoves(env.players[0].hand,env.me,[env.players[0].numCards, env.players[1].numCards],env.players[0].numPlayable)
+        legalmoves = [1]+legalmoves[2:]
+        # print('       ',legalmoves[1:], sum(legalmoves))
+        # print('legalities',legalmoves, env.players[0].hand)
+        if not legalmoves:
+            return torch.tensor([[0]], device=device, dtype=torch.long)
+       
+        a = env.action_space.sample()
+        while(not legalmoves[int(a)]): a = env.action_space.sample()
+        # print(a, env.players[0].hand, legalmoves)
+        # print(' '*len(str(a+1))+'  0  1  2  3  4  5  6  7  8  9 10 11')
+        # print(a if not a else a+1, env.players[0].hand, 'ophand', env.players[1].hand)
+        # if(any(i for i in env.players[1].hand+env.players[0].hand if i < 0)): assert 1==2
+        return torch.tensor([[a]], device=device, dtype=torch.long)
 
 
 episode_durations = []
@@ -137,6 +161,7 @@ def plot_durations(show_result=False):
     plt.xlabel('Episode')
     plt.ylabel('Duration')
     plt.plot(durations_t.numpy())
+    # plt.plot([i[-1] for i in memory])
     # Take 100 episode averages and plot them too
     if len(durations_t) >= 100:
         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
@@ -199,19 +224,30 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available() or torch.backends.mps.is_available():
-    num_episodes = 600
+    num_episodes = 5000
 else:
     num_episodes = 50
 
+allrwds = []
+outcomes = []
+
 for i_episode in range(num_episodes):
+    tic = time.time()
     # Initialize the environment and get its state
     state = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
+        # print(env.players[0].hand)
         action = select_action(state)
-        print('action',action)
-        observation, reward, terminated, truncated = env.step(action.item())
+
+        a1 = action.item() if not action else action.item()+1
+
+
+        # print('action',action)
+        observation, reward, terminated, truncated, whowon = env.step(a1)
+
         reward = torch.tensor([reward], device=device)
+        
         done = terminated or truncated
 
         if terminated:
@@ -221,6 +257,13 @@ for i_episode in range(num_episodes):
 
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
+
+        if(terminated):
+            allrwds.append(reward)
+            outcomes.append(whowon)
+            # print(whowon)
+
+        # print
 
         # Move to the next state
         state = next_state
@@ -238,12 +281,15 @@ for i_episode in range(num_episodes):
 
         if done:
             episode_durations.append(t + 1)
-            plot_durations()
+            # plot_durations()
             break
+    print(i_episode, 'winrate', outcomes[-20:].count(0)/len(outcomes[-20:]), 'Games/sec', 1/(time.time()-tic))
+    # print('Games Per Second', )
 
 print('Complete')
-torch.save(target_net_state_dict(), './target_net')
-torch.save(policy_net_state_dict(), './policy_net')
+print('Total time', time.time()-ctic)
+torch.save(target_net_state_dict, './01_target_net')
+torch.save(policy_net_state_dict, './01_policy_net')
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()
