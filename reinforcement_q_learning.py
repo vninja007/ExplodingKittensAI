@@ -9,7 +9,6 @@ Original file is located at
 
 import time
 ctic = time.time()
-
 import gymnasium as gym
 import math
 import random
@@ -22,6 +21,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from inputimeout import inputimeout, TimeoutOccurred
 
 # env = gym.make("CartPole-v1")
 env = ExplodingKittensEnv()
@@ -66,8 +66,8 @@ class DQN(nn.Module):
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
         self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        self.layer2 = nn.Linear(128, 32)
+        self.layer3 = nn.Linear(32, n_actions)
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
@@ -89,8 +89,8 @@ GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
 EPS_DECAY = 1000
-TAU = 0.005
-LR = 1e-4
+TAU = 0.01 #.005
+LR = 1e-2
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
@@ -100,6 +100,10 @@ n_observations = len(state)
 
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
+
+i_episode = 4000
+policy_net.load_state_dict(torch.load(f'./03_policy_net_{i_episode}'))
+target_net.load_state_dict(torch.load(f'./03_target_net_{i_episode}'))
 target_net.load_state_dict(policy_net.state_dict())
 
 optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
@@ -117,7 +121,8 @@ def select_action(state):
     steps_done += 1
 
     # for _ in range(1):
-    if sample > eps_threshold:
+    # if sample > eps_threshold:
+    if True:
         with torch.no_grad():
             # t.max(1) will return the largest column value of each row.
             # second column on max result is index of where max element was
@@ -231,65 +236,71 @@ else:
 allrwds = []
 outcomes = []
 
-for i_episode in range(num_episodes):
-    tic = time.time()
-    # Initialize the environment and get its state
-    state = env.reset()
-    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
-    for t in count():
-        # print(env.players[0].hand)
-        action = select_action(state)
+try:
+    while True:
+        tic = time.time()
+        # Initialize the environment and get its state
+        state = env.reset()
+        state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+        for t in count():
+            # print(env.players[0].hand)
+            action = select_action(state)
 
-        a1 = action.item() if not action else action.item()+1
+            a1 = action.item() if not action else action.item()+1
 
 
-        # print('action',action)
-        observation, reward, terminated, truncated, whowon = env.step(a1)
+            # print('action',action)
+            observation, reward, terminated, truncated, whowon = env.step(a1)
 
-        reward = torch.tensor([reward], device=device)
-        
-        done = terminated or truncated
+            reward = torch.tensor([reward], device=device)
+            
+            done = terminated or truncated
 
-        if terminated:
-            next_state = None
-        else:
-            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+            if terminated:
+                next_state = None
+            else:
+                next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-        # Store the transition in memory
-        memory.push(state, action, next_state, reward)
+            # Store the transition in memory
+            memory.push(state, action, next_state, reward)
 
-        if(terminated):
-            allrwds.append(reward)
-            outcomes.append(whowon)
-            # print(whowon)
+            if(terminated):
+                allrwds.append(reward)
+                outcomes.append(whowon)
+                # print(whowon)
 
-        # print
+            # print
 
-        # Move to the next state
-        state = next_state
+            # Move to the next state
+            state = next_state
 
-        # Perform one step of the optimization (on the policy network)
-        optimize_model()
+            # Perform one step of the optimization (on the policy network)
+            optimize_model()
 
-        # Soft update of the target network's weights
-        # θ′ ← τ θ + (1 −τ )θ′
-        target_net_state_dict = target_net.state_dict()
-        policy_net_state_dict = policy_net.state_dict()
-        for key in policy_net_state_dict:
-            target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
-        target_net.load_state_dict(target_net_state_dict)
+            # Soft update of the target network's weights
+            # θ′ ← τ θ + (1 −τ )θ′
+            target_net_state_dict = target_net.state_dict()
+            policy_net_state_dict = policy_net.state_dict()
+            for key in policy_net_state_dict:
+                target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
+            target_net.load_state_dict(target_net_state_dict)
 
-        if done:
-            episode_durations.append(t + 1)
-            # plot_durations()
-            break
-    print(i_episode, 'winrate', outcomes[-20:].count(0)/len(outcomes[-20:]), 'Games/sec', 1/(time.time()-tic))
-    # print('Games Per Second', )
+            if done:
+                episode_durations.append(t + 1)
+                # plot_durations()
+                break
+        print(i_episode, 'winrate', outcomes[-100:].count(0)/len(outcomes[-100:]), 'Games/sec', 1/(time.time()-tic+.001), 'lastoutcome', outcomes[-1])
+        i_episode += 1
+        # print('Games Per Second', )
+        if(i_episode%1000==0):
+            torch.save(target_net_state_dict, f'./03_target_net_{i_episode}')
+            torch.save(policy_net_state_dict, f'./03_policy_net_{i_episode}')
 
-print('Complete')
-print('Total time', time.time()-ctic)
-torch.save(target_net_state_dict, './01_target_net')
-torch.save(policy_net_state_dict, './01_policy_net')
-plot_durations(show_result=True)
-plt.ioff()
-plt.show()
+except KeyboardInterrupt:
+    print('Complete')
+    print('Total time', time.time()-ctic)
+    torch.save(target_net_state_dict, './03_target_net')
+    torch.save(policy_net_state_dict, './03_policy_net')
+    plot_durations(show_result=True)
+    plt.ioff()
+    plt.show()
