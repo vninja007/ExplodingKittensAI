@@ -2,8 +2,8 @@ import random
 import numpy as np
 rng = np.random.default_rng()
 
-# randomlist = [int(i) for i in open('random256.txt').readlines()]
-# startind = random.randint(0,len(randomlist)//10)
+randomlist = [int(i) for i in open('random256.txt').readlines()]
+startind = random.randint(0,len(randomlist)//10)
 
 
 
@@ -13,6 +13,7 @@ class Player: #RandomPlayer
         self.numPlayable = sum(hand[2:7]) + sum([hand[i]//2 for i in range(7,12)])
         self.numCards = 8
         self.hand = hand
+    
     def inform(self, player, move, moveData):
         if(player!=self.name and move>=7 and moveData['victim']==int(self.name)):
             cardtaken = moveData['cardtaken']
@@ -62,58 +63,59 @@ class Player: #RandomPlayer
     
 
 
-# class ARPlayer(Player): #AlternateRandomPlayeri
-#     def getMove(self, toDraw, movectr, turnctr, deckhandlens):
-#     #Return None = draw ONE card
-#         global startind
-#         startind += 1; startind %= 100000
-#         # print(startind)
-#         psbls = whatcaniplay(self.hand,self.name,deckhandlens)
-#         if(not psbls):
-#             return None
-#         else:
-#             playcard = randomlist[startind]%2
-#             if(not playcard):
-#                 return None
-#             else:
-#                 return psbls[randomlist[startind]%len(psbls)]
-#         # chosenmove = random.choice(psbls)
+class ARPlayer(Player): #AlternateRandomPlayeri
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+    #Return None = draw ONE card
+        global startind
+        startind += 1; startind %= 100000
+        # print(startind)
 
-# class CommonSensePlayer(Player): #CommonSensePlayer
-#     def __init__(self, name, hand):
-#         self.name = name
-#         self.hand = hand
-#         self.movehistory = {}
-#     def inform(self, player, move, moveData):
-#         pass
-#     def getMove(self, toDraw, movectr, turnctr, deckhandlens):
-#         #Return None = draw ONE card
-#         if(movectr not in self.movehistory): self.movehistory[movectr] = set()
+        playcard = randomlist[startind%2]
+        if(not playcard): return None
+        chosenmove = giveRandomMove(self.hand,self.name,deckhandlens, self.numPlayable)
+        if(chosenmove!=None): self.numPlayable -= 1
 
-#         psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
-#         chosenmove = random.choice(psbls)
+        return chosenmove
+        # chosenmove = random.choice(psbls)
 
-#         if('STF' in self.movehistory[movectr]):
-#             while(chosenmove == 'STF'): 
-#                 # print('stf', chosenmove, self.hand)
-#                 chosenmove = random.choice(psbls)
-#         if('SHUF' in self.movehistory[movectr]):
-#             while(chosenmove == 'SHUF'): chosenmove = random.choice(psbls)
-#         # print(self.name, movectr, turnctr, chosenmove, self.hand)
-#         self.movehistory[movectr].add(chosenmove)
-#         return chosenmove
-#     def getFavored(self):
-#         index = random.randrange(len(self.hand))
-#         pickable = [i for i in self.hand if i!='DEF' and i!='FVR' and i!='NOPE']
-#         if(not pickable):
-#             if('NOPE' in self.hand): 
-#                 self.hand.remove('NOPE')
-#                 return 'NOPE'
-#             if('FVR' in self.hand): 
-#                 self.hand.remove('FVR')
-#                 return 'FVR'
-#             self.hand.remove('DEF')
-#             return 'DEF'
+class CommonSensePlayer(Player): #CommonSensePlayer
+    def __init__(self, name, hand):
+        super().__init__(name,hand)
+        self.movehistory = {}
+
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+        #Return None = draw ONE card
+        if(movectr not in self.movehistory): self.movehistory[movectr] = set()
+        presets = {}
+        
+        if('STF' in self.movehistory[movectr]): presets[6] = 0
+        if('SHUF' in self.movehistory[movectr]): presets[5] = 0
+
+        chosenmove = giveRandomMove(self.hand,self.name,deckhandlens, self.numPlayable,victim=None,includeNone=True,presets=presets)
+        # psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
+        # chosenmove = random.choice(psbls)
+
+        
+        self.movehistory[movectr].add(chosenmove)
+        return chosenmove
+    def getFavored(self):
+        favortables = list(self.hand)
+        x = sum(self.hand)
+        if(self.hand[0]!=x):
+            x -= self.hand[0]
+            favortables[0] = 0
+            if(self.hand[4]!=x):
+                x -= self.hand[4]
+                favortables[4] = 0
+                if(self.hand[1]!=x):
+                    x -= self.hand[1]
+                    favortables[1] = 0
+        togiveaway = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=favortables, k=1)[0]
+        self.hand[togiveaway] -= 1
+        self.numCards -= 1
+        if(2 <= togiveaway <= 6): self.numPlayable -= 1
+        elif(togiveaway >= 7 and self.hand[togiveaway]%2==1): self.numPlayable -= 1
+        return togiveaway
             
             
 #         chosen = pickable.pop(random.randrange(len(pickable)))
@@ -175,7 +177,7 @@ def weighted_random_choice(choices, weights):
 
 
     
-def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True):
+def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True,presets={}):
     
     if(numPlayable == 0): return None
     # print(numPlayable, deck, deckhandlens)
@@ -201,6 +203,8 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
         possible[10] = 0
         possible[11] = 0
 
+    for i in presets:
+        possible[i] = presets[i]
     if(possible==[0]*12): return None
     numbers = [0,1,2,3,4,5,6,7,8,9,10,11]
 

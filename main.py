@@ -39,7 +39,7 @@ def initDeck(deck, playerdecks, players, PLAYERS):
 
     rng.shuffle(deck)
     players.append(Player(0,playerdecks[0]))
-    players.append(Player(1,playerdecks[1]))
+    players.append(CommonSensePlayer(1,playerdecks[1]))
 
 
 # while len(players):
