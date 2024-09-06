@@ -38,8 +38,8 @@ def initDeck(deck, playerdecks, players, PLAYERS):
     deck.extend([-1 for i in range(PLAYERS-1)])
 
     rng.shuffle(deck)
-    players.append(Player(0,playerdecks[0]))
-    players.append(CommonSensePlayer(1,playerdecks[1]))
+    players.append(CommonSensePlayer(0,playerdecks[0]))
+    players.append(RunningPlayer(1,playerdecks[1]))
 
 
 # while len(players):
@@ -56,10 +56,13 @@ def simulateGame(PLAYERS):
     victim = 1
     toDraw = 1
     while toDraw and len(players)>1:
+        # print(len(deck))
+        # input()
         move = 'skibidi'
         while move:
             move = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards])
-            
+            # print(turn, move)
+            # input()
             if(move):
                 players[turn].numCards -= 1
                 playerdecks[turn][move] -= 1
@@ -67,6 +70,8 @@ def simulateGame(PLAYERS):
                     players[turn].numCards -= 1
                     playerdecks[turn][move] -= 1
             victim = turn^1
+            # print(players[1].hand,players[1].numPlayable, sum(players[1].hand[2:7]) + sum([players[1].hand[i]//2 for i in range(7,12)]), turn, move)
+            
             # print('turn', turn, playerdecks[0], playerdecks[1], 'np0', players[0].numPlayable, 'np1', players[1].numPlayable, 'lendeck', len(deck), 'move', move)
             
             if(not move): continue
@@ -106,7 +111,7 @@ def simulateGame(PLAYERS):
         # print('nextcard', nextcard)
         safe = players[turn].cardDrawn(nextcard)
         movectr += 1
-        if(not safe): players.pop(turn); toDraw = 1
+        if(not safe): return (players[turn^1].name, len(deck), players[1].hand); players.pop(turn); toDraw = 1
         else:
             if(safe==1): 
                 if(not deck): deck = [-1]
@@ -114,20 +119,25 @@ def simulateGame(PLAYERS):
                     deck.insert(players[turn].reinsertEK(len(deck)),-1)
             toDraw -= 1
             if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
-    return players[0].name
-
+    # return 
 # print(players[0].hand)
 # print("Player",players[0].name,"won by",players[0].hand.count('DEF'),'defuses')
 # print(players[0].getMove())
 
+wfile = open('results_SPAM.txt','a+')
 if __name__ == '__main__':
     onewin = 0
     zerowin = 0
+    lastloss = 0
+    sum0 = 0
     for _ in range(int(1e4)):
-        res = simulateGame(2)
+        res, numcards,finalhand = simulateGame(2)
+        if(not res and numcards<=6): lastloss += finalhand[1]; sum0 += 1
+        if(not res):
+                wfile.write(str(finalhand)+'\n')
         # print(res)
         if(res==1): onewin += 1
         else: zerowin += 1
 
-    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin))
+    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin), lastloss/sum0)
     print(time.time()-ctic)

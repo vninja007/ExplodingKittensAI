@@ -5,6 +5,7 @@ rng = np.random.default_rng()
 randomlist = [int(i) for i in open('random256.txt').readlines()]
 startind = random.randint(0,len(randomlist)//10)
 
+# resultfile = open('results_03.txt','a+')
 
 
 class Player: #RandomPlayer
@@ -88,8 +89,8 @@ class CommonSensePlayer(Player): #CommonSensePlayer
         if(movectr not in self.movehistory): self.movehistory[movectr] = set()
         presets = {}
         
-        if('STF' in self.movehistory[movectr]): presets[6] = 0
-        if('SHUF' in self.movehistory[movectr]): presets[5] = 0
+        if(6 in self.movehistory[movectr]): presets[6] = 0
+        if(5 in self.movehistory[movectr]): presets[5] = 0
 
         chosenmove = giveRandomMove(self.hand,self.name,deckhandlens, self.numPlayable,victim=None,includeNone=True,presets=presets)
         # psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
@@ -123,49 +124,53 @@ class CommonSensePlayer(Player): #CommonSensePlayer
 #         return chosen
 #         # return self.hand.pop(random.randrange(len(self.hand)))
 
-# class RunningPlayer(CommonSensePlayer):
-#     def getMove(self, toDraw, movectr, turnctr, deckhandlens):
-#         global startind
-#         # startind += 1; startind %= 100000
-#         # playcard = randomlist[startind]%2
-#         # if(not playcard): return None
-#         # if(turnctr<15): return None
-#         if(turnctr<35 and self.hand.count('DEF')): return None
-#         # if(turnctr<20): return None
-#         handset = set(self.hand)
-#         if(movectr not in self.movehistory): self.movehistory[movectr] = set()
-
-#         psbls = whatcaniplay(self.hand,self.name,deckhandlens)+[None]
-#         if('FVR' in psbls): return 'FVR'
-#         if('C1' in psbls): return 'C1'
-#         if('C2' in psbls): return 'C2'
-#         if('C3' in psbls): return 'C3'
-#         if('C4' in psbls): return 'C4'
-#         if('C5' in psbls): return 'C5'
-
-#         if(toDraw > 1 and 'ATK' in psbls): return 'ATK'
-#         if(toDraw>1 and 'SKIP' in psbls): return 'SKIP'
-#         if(movectr>40 and 'ATK' in psbls): return 'ATK'
-#         if(movectr>40 and 'SKIP' in psbls): return 'SKIP'
-#         # catcards = [i for i in psbls if type(i)==str and i[0]=='C']
-#         # if(catcards): return catcards[0]
-
-
-
-#         chosenmove = random.choice(psbls)
-
-#         if('STF' in self.movehistory[movectr]):
-#             while(chosenmove == 'STF'): 
-#                 # print('stf', chosenmove, self.hand)
-#                 chosenmove = random.choice(psbls)
-#         if('SHUF' in self.movehistory[movectr]):
-#             while(chosenmove == 'SHUF'): chosenmove = random.choice(psbls)
-#         # print(self.name, movectr, turnctr, chosenmove, self.hand)
-#         self.movehistory[movectr].add(chosenmove)
-#         return chosenmove
+class RunningPlayer(CommonSensePlayer):
+    def getMove(self, toDraw, movectr, turnctr, deckhandlens):
+        global startind
+        # startind += 1; startind %= 100000
+        # playcard = randomlist[startind]%2
+        # if(not playcard): return None
+        # if(turnctr<15): return None
+        if(turnctr<35 and self.hand[0]): return None
+        # if(turnctr<20): return None
+        handset = set(self.hand)
+        if(movectr not in self.movehistory): self.movehistory[movectr] = set()
+        presets = {6:0}
+        
+        if(6 in self.movehistory[movectr]): presets[6] = 0
+        if(5 in self.movehistory[movectr]): presets[5] = 0
+        psbls = givePsbls(self.hand,self.name,deckhandlens,None,presets)
+        # print(psbls)
+        if(psbls[4]): self.numPlayable -= 1; return 4;
+        if(psbls[7]): self.numPlayable -= 1; return 7;
+        if(psbls[8]): self.numPlayable -= 1; return 8;
+        if(psbls[9]): self.numPlayable -= 1; return 9;
+        if(psbls[10]): self.numPlayable -= 1; return 10;
+        if(psbls[11]): self.numPlayable -= 1; return 11;
     
-#     def reinsertEK(self, decklen):
-#         return 1
+
+        
+        if(toDraw > 1 and psbls[2]): self.numPlayable -= 1; return 2;
+        if(toDraw>1 and psbls[3]): self.numPlayable -= 1; return 3
+        if(movectr>40 and psbls[2]): self.numPlayable -= 1; return 2
+        if(movectr>40 and psbls[3]): self.numPlayable -= 1; return 3
+        # catcards = [i for i in psbls if type(i)==str and i[0]=='C']
+        # if(catcards): return catcards[0]
+
+
+        if(psbls==[0]*12): return None
+        chosenmove = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=psbls, k=1)[0]
+        if (chosenmove): self.numPlayable -= 1;
+        self.movehistory[movectr].add(chosenmove)
+        
+        # print(self.hand, psbls, self.numPlayable, chosenmove)
+        # print(turnctr)
+        # input()
+        return chosenmove
+    
+    def reinsertEK(self, decklen):
+        # if(not self.hand[0]): resultfile.write(str(decklen)+'\n')
+        return 3
 
 
 def weighted_random_choice(choices, weights):
@@ -175,15 +180,7 @@ def weighted_random_choice(choices, weights):
     idx = np.searchsorted(cum_weights, rand_val)
     return choices[idx]
 
-
-    
-def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True,presets={}):
-    
-    if(numPlayable == 0): return None
-    # print(numPlayable, deck, deckhandlens)
-    if(includeNone and not int(random.random()*(numPlayable+1))): return None
-    # if(includeNone and not random.randint(0,numPlayable)): return None
-    
+def givePsbls(deck,name,deckhandlens,victim=None,presets={}):
     if(victim == None): victim = 1 if int(name)==0 else 0
 
     possible = list(deck)
@@ -205,10 +202,23 @@ def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=Tr
 
     for i in presets:
         possible[i] = presets[i]
+    return possible
+
+    
+def giveRandomMove(deck,name,deckhandlens,numPlayable,victim=None,includeNone=True,presets={}):
+    
+    if(numPlayable == 0): return None
+    # print(numPlayable, deck, deckhandlens)
+    if(includeNone and not int(random.random()*(numPlayable+1))): return None
+    # if(includeNone and not random.randint(0,numPlayable)): return None
+    
+    possible = givePsbls(deck, name, deckhandlens, victim, presets)
+    
     if(possible==[0]*12): return None
     numbers = [0,1,2,3,4,5,6,7,8,9,10,11]
 
     # return weighted_random_choice(numbers, possible)
+    # print('possible',possible)
     return random.choices(numbers, weights=possible, k=1)[0]
 
 def LCG(x, a, c, m): #https://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf
