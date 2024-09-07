@@ -79,33 +79,50 @@ def simulateGame(PLAYERS):
             #     player.inform(turn, move, victim if move==4 or move>=7 else None)
 
             if(move==2):
-                toDraw = toDraw+1 if toDraw==1 else toDraw+2
-                turn += 1; turn %= PLAYERS
-                turnctr += 1
-                movectr += 1
+                if(turn==0 and players[1].hand[1]>0 and turnctr>25):
+                    players[1].hand[1] -= 1;
+                    players[1].numCards -= 1;
+                else:
+                    toDraw = toDraw+1 if toDraw==1 else toDraw+2
+                    turn += 1; turn %= PLAYERS
+                    turnctr += 1
+                    movectr += 1
             elif(move==3):
-                turn += 1; turn %= PLAYERS
-                turnctr += 1
-                movectr += 1
+                if(turn==0 and players[1].hand[1]>0 and turnctr>25):
+                    players[1].hand[1] -= 1;
+                    players[1].numCards -= 1;
+                
+                else:
+                    turn += 1; turn %= PLAYERS
+                    turnctr += 1
+                    movectr += 1
             elif(move==4):
-                favorcard = players[victim].getFavored()
-                # print('favorcard', favorcard)
-                players[turn].hand[favorcard] += 1 
-                players[turn].numCards += 1
-                players[turn].inform(turn, move, {'victim': victim, 'cardtaken': favorcard})
+                if(turn==0 and players[1].hand[1]>0):
+                    players[1].hand[1] -= 1;
+                    players[1].numCards -= 1;
+                else:
+                    favorcard = players[victim].getFavored()
+                    # print('favorcard', favorcard)
+                    players[turn].hand[favorcard] += 1 
+                    players[turn].numCards += 1
+                    players[turn].inform(turn, move, {'victim': victim, 'cardtaken': favorcard})
             elif(move==5):
                 rng.shuffle(deck)
             elif(move==6):
                 players[turn].inform(turn,6,deck[:-4:-1])
             elif(move>=7):
-                cardtaken = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=players[victim].hand, k=1)[0]
-                # print('cardtaken', cardtaken)
-                players[victim].hand[cardtaken] -= 1
-                players[victim].numCards -= 1
-                players[victim].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
-                players[turn].hand[cardtaken] += 1
-                players[turn].numCards += 1
-                players[turn].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
+                if(turn==0 and players[1].hand[1]>0):
+                    players[1].hand[1] -= 1;
+                    players[1].numCards -= 1;
+                else:
+                    cardtaken = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=players[victim].hand, k=1)[0]
+                    # print('cardtaken', cardtaken)
+                    players[victim].hand[cardtaken] -= 1
+                    players[victim].numCards -= 1
+                    players[victim].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
+                    players[turn].hand[cardtaken] += 1
+                    players[turn].numCards += 1
+                    players[turn].inform(turn, move, {'victim': victim, 'cardtaken': cardtaken})
         # print(deck)
         nextcard = deck.pop()
         # print('nextcard', nextcard)
@@ -124,7 +141,7 @@ def simulateGame(PLAYERS):
 # print("Player",players[0].name,"won by",players[0].hand.count('DEF'),'defuses')
 # print(players[0].getMove())
 
-wfile = open('results_SPAM.txt','a+')
+wfile = open('results_SPAM2.txt','a+')
 if __name__ == '__main__':
     onewin = 0
     zerowin = 0
@@ -132,12 +149,12 @@ if __name__ == '__main__':
     sum0 = 0
     for _ in range(int(1e4)):
         res, numcards,finalhand = simulateGame(2)
-        if(not res and numcards<=6): lastloss += finalhand[1]; sum0 += 1
+        if(not res and numcards<=0): sum0 += 1
         if(not res):
                 wfile.write(str(finalhand)+'\n')
         # print(res)
         if(res==1): onewin += 1
         else: zerowin += 1
 
-    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin), lastloss/sum0)
+    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin), sum0/zerowin)
     print(time.time()-ctic)
