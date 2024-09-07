@@ -24,8 +24,8 @@ import torch.nn.functional as F
 from inputimeout import inputimeout, TimeoutOccurred
 
 TESTING = False
-i_episode = 5000
-ver = '03'
+i_episode = 0
+ver = '07'
 
 
 # env = gym.make("CartPole-v1")
@@ -95,7 +95,7 @@ EPS_START = 0.9
 EPS_END = 0.05
 EPS_DECAY = 1000
 TAU = 0.001 #.005
-LR = 1e-6
+LR = 1e-3
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
