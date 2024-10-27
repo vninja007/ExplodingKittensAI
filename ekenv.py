@@ -1,4 +1,4 @@
-
+#Note: in order to make the ExplodingKittens gym environment, I had adpted some parts of the code from https://github.com/adithyasolai/Monte-Carlo-Blackjack/blob/master/MC_Blackjack_Full.ipynb
 
 import random
 import numpy as np
