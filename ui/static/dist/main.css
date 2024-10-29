@@ -6,6 +6,7 @@ h1 {
     margin: 0;
     border: 0;
     padding: 0;
+    padding-top: 30vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,4 +64,5 @@ h1 {
 .unplayable {
     /* filter: grayscale(70%); */
     filter: opacity(30%);
+    box-shadow: none !important;
 }

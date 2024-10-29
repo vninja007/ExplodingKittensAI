@@ -25,6 +25,7 @@ def image_clicked(image_id):
     if(7 <= image_id <= 11 and playerhand[image_id] >= 2):
         playerhand[image_id] -= 2
     
+    print({f'card{i}':playerhand[i] for i in range(12)})
 
     return jsonify({f'card{i}':playerhand[i] for i in range(12)})
     
