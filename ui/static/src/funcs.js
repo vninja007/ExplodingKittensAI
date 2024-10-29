@@ -16,6 +16,7 @@ function imageClicked(imageId) {
                         .classList.remove("unplayable");
                 }
             }
+            document.getElementById("deckcount").innerHTML = data[`decklen`];
         })
         .catch((error) => console.error("Error:", error));
 }

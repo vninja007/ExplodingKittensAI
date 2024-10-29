@@ -13,6 +13,20 @@
     <body>
         <h1>html text</h1>
         <h1>{{ text }}</h1>
+        <div class="deckgridflex">
+            <div class="deckstack">
+                <div class="cardstack-container">
+                    <img
+                        id="deckimg"
+                        src="./static/imgs/back.jpg"
+                        onclick="imageClicked(100)"
+                        alt="Deck"
+                    />
+
+                    <div class="circle" id="deckcount">{{decklen}}</div>
+                </div>
+            </div>
+        </div>
         <div class="cardgridflex">
             <div class="cardgrid">
                 {% for i, cardcount in enumerate(legalmoves) %}
