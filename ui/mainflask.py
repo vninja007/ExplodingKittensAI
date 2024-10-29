@@ -22,7 +22,7 @@ def image_clicked(image_id):
 
     if(2 <= image_id <= 6 and playerhand[image_id] >= 1):
         playerhand[image_id] -= 1
-    if(image_id >= 7 and playerhand[image_id] >= 2):
+    if(7 <= image_id <= 11 and playerhand[image_id] >= 2):
         playerhand[image_id] -= 2
     
 
