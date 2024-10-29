@@ -11,8 +11,6 @@ css = Bundle("src/style.css", output="dist/main.css")
 assets.register("css", css)
 css.build()
 
-# 
-# playerhand = [*range(12)]
 decklen = 35
 isOver = False
 
@@ -41,14 +39,11 @@ def image_clicked(image_id):
             # decklen -= 1
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(0, players, turn, turnctr, movectr, victim, toDraw, deck)
         print(isOver)
-            # while True: pass
-        # print({f'card{i}':playerhand[i] for i in range(12)})
 
     return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver})
     
     
     
-    # return f'Image {image_id} was clicked!'
 
 if __name__ == "__main__":
     app.run(debug=True)
