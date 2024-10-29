@@ -15,149 +15,22 @@
         <h1>{{ text }}</h1>
         <div class="cardgridflex">
             <div class="cardgrid">
+                {% for i, cardcount in enumerate(legalmoves) %}
                 <div class="cardstack">
                     <div class="cardstack-container">
                         <img
-                            id="card0img"
-                            class="unplayable"
-                            src="./static/imgs/0.jpg"
-                            onclick="imageClicked(0)"
+                            id="card{{ i }}img"
+                            src="./static/imgs/{{ i }}.jpg"
+                            onclick="imageClicked({{ i }})"
                             alt="Defuse"
                         />
 
-                        <div class="circle" id="card0count">0</div>
+                        <div class="circle" id="card{{ i }}count">
+                            {{ cardcount }}
+                        </div>
                     </div>
                 </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card1img"
-                            class="unplayable"
-                            src="./static/imgs/1.jpg"
-                            onclick="imageClicked(1)"
-                            alt="Nope"
-                        />
-
-                        <div class="circle" id="card1count">1</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card2img"
-                            src="./static/imgs/2.jpg"
-                            onclick="imageClicked(2)"
-                            alt="Attack"
-                        />
-
-                        <div class="circle" id="card2count">2</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card3img"
-                            src="./static/imgs/3.jpg"
-                            onclick="imageClicked(3)"
-                            alt="Skip"
-                        />
-
-                        <div class="circle" id="card3count">3</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card4img"
-                            src="./static/imgs/4.jpg"
-                            onclick="imageClicked(4)"
-                            alt="Favor"
-                        />
-
-                        <div class="circle" id="card4count">4</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card5img"
-                            src="./static/imgs/5.jpg"
-                            onclick="imageClicked(5)"
-                            alt="Shuffle"
-                        />
-
-                        <div class="circle" id="card5count">5</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card6img"
-                            src="./static/imgs/6.jpg"
-                            onclick="imageClicked(6)"
-                            alt="See The Future"
-                        />
-                        <div class="circle" id="card6count">6</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card7img"
-                            src="./static/imgs/7.jpg"
-                            onclick="imageClicked(7)"
-                            alt="C1"
-                        />
-                        <div class="circle" id="card7count">7</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card8img"
-                            src="./static/imgs/8.jpg"
-                            onclick="imageClicked(8)"
-                            alt="C2"
-                        />
-
-                        <div class="circle" id="card8count">8</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card9img"
-                            src="./static/imgs/9.jpg"
-                            onclick="imageClicked(9)"
-                            alt="C3"
-                        />
-
-                        <div class="circle" id="card9count">9</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card10img"
-                            src="./static/imgs/10.jpg"
-                            onclick="imageClicked(10)"
-                            alt="C4"
-                        />
-
-                        <div class="circle" id="card10count">10</div>
-                    </div>
-                </div>
-                <div class="cardstack">
-                    <div class="cardstack-container">
-                        <img
-                            id="card11img"
-                            src="./static/imgs/11.jpg"
-                            onclick="imageClicked(11)"
-                            alt="C5"
-                        />
-                        <div class="circle" id="card11count">11</div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </body>

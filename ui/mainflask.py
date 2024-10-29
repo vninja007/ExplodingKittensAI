@@ -14,7 +14,7 @@ playerhand = [*range(12)]
 
 @app.route("/")
 def homepage():
-    return render_template("index.html", legalmoves = playerhand)
+    return render_template("index.html", legalmoves = playerhand, enumerate=enumerate)
 
 @app.route('/image_clicked/<int:image_id>')
 def image_clicked(image_id):
