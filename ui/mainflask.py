@@ -10,15 +10,27 @@ assets.register("css", css)
 css.build()
 
 
+playerhand = [*range(12)]
+
 @app.route("/")
 def homepage():
-    return render_template("index.html", legalmoves =[*range(12)])
+    return render_template("index.html", legalmoves = playerhand)
 
 @app.route('/image_clicked/<int:image_id>')
 def image_clicked(image_id):
-    # Process the image click (e.g., log it, update a database, etc.)
     print(image_id)
-    return f'Image {image_id} was clicked!'
+
+    if(2 <= image_id <= 6 and playerhand[image_id] >= 1):
+        playerhand[image_id] -= 1
+    if(image_id >= 7 and playerhand[image_id] >= 2):
+        playerhand[image_id] -= 2
+    
+
+    return jsonify({f'card{i}':playerhand[i] for i in range(12)})
+    
+    
+    
+    # return f'Image {image_id} was clicked!'
 
 if __name__ == "__main__":
     app.run(debug=True)
