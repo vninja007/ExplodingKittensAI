@@ -11,6 +11,17 @@ h1 {
     gap: 150px;
 }
 
+.aigridflex {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 150px;
+    padding-bottom: 10vh;
+}
+
 .deckstack {
     width: 75px;
     height: 110px;
@@ -32,6 +43,17 @@ h1 {
 
 .deckstack img:hover {
     box-shadow: 0 0 15px rgba(255, 0, 0, 1);
+}
+
+.aistack img {
+    width: 100%;
+    height: 100%;
+    transition: box-shadow 0.3s ease;
+}
+
+.aistack {
+    width: 75px;
+    height: 110px;
 }
 
 .cardgridflex {

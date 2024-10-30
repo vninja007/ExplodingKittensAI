@@ -21,7 +21,7 @@ print(deck)
 
 @app.route("/")
 def homepage():
-    return render_template("index.html", legalmoves = playerhand, decklen = decklen, enumerate=enumerate)
+    return render_template("index.html", legalmoves = playerhand, decklen = decklen, enumerate=enumerate,aicardcount = sum(players[1].hand))
 
 @app.route('/image_clicked/<int:image_id>')
 def image_clicked(image_id):
@@ -52,7 +52,7 @@ def image_clicked(image_id):
                 print('isover after ai', isOver)
         # print(isOver)
 
-    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw})
+    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)})
     
     
     

@@ -14,6 +14,19 @@
         <h1 id="turnis">Player: Human</h1>
         <h1 id="deadindicator"></h1>
         <h1 id="toDraw"></h1>
+        <div class="aigridflex">
+            <div class="deckstack">
+                <div class="cardstack-container">
+                    <img
+                        id="aicardstackimg"
+                        src="./static/imgs/back.jpg"
+                        alt="Deck"
+                    />
+
+                    <div class="circle" id="aicardcount">{{aicardcount}}</div>
+                </div>
+            </div>
+        </div>
         <div class="deckgridflex">
             <div class="deckstack">
                 <div class="cardstack-container">
@@ -30,12 +43,10 @@
             <div class="discardstack">
                 <div class="cardstack-container">
                     <img
-                        id="deckimg"
+                        id="discardimg"
                         src="./static/imgs/back.jpg"
                         alt="Discard"
                     />
-
-                    <!-- <div class="circle" id="discardcount">{{decklen}}</div> -->
                 </div>
             </div>
         </div>
@@ -59,6 +70,7 @@
                 {% endfor %}
             </div>
         </div>
+
         <script>
             window.onload = function () {
                 imageClicked(999);

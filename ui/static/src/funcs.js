@@ -34,6 +34,8 @@ function imageClicked(imageId) {
             }
             document.getElementById("toDraw").innerHTML =
                 "ToDraw: " + data["toDraw"];
+            document.getElementById("aicardcount").innerHTML =
+                data["aicardcount"];
         })
         .catch((error) => console.error("Error:", error));
 }
