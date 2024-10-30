@@ -32,28 +32,29 @@ def simulateMove(move, players, turn, turnctr, movectr, victim, toDraw, deck):
     victim = turn^1
 
     if(move==2):
-        if(turn==0 and players[1].hand[1]>0 and turnctr>25):
-            players[1].hand[1] -= 1;
-            players[1].numCards -= 1;
-        else:
+        # if(turn==0 and players[1].hand[1]>0 and turnctr>25):
+        #     players[1].hand[1] -= 1;
+        #     players[1].numCards -= 1;
+        # else:
             toDraw = toDraw+1 if toDraw==1 else toDraw+2
             turn += 1; turn %= PLAYERS
             turnctr += 1
             movectr += 1
     elif(move==3):
-        if(turn==0 and players[1].hand[1]>0 and turnctr>25):
-            players[1].hand[1] -= 1;
-            players[1].numCards -= 1;
+        # if(turn==0 and players[1].hand[1]>0 and turnctr>25):
+        #     players[1].hand[1] -= 1;
+        #     players[1].numCards -= 1;
         
-        else:
-            turn += 1; turn %= PLAYERS
+        # else:
+            toDraw -= 1;
+            if(toDraw==0): turn += 1; turn %= PLAYERS; toDraw = 1;
             turnctr += 1
             movectr += 1
     elif(move==4):
-        if(turn==0 and players[1].hand[1]>0):
-            players[1].hand[1] -= 1;
-            players[1].numCards -= 1;
-        else:
+        # if(turn==0 and players[1].hand[1]>0):
+        #     players[1].hand[1] -= 1;
+        #     players[1].numCards -= 1;
+        # else:
             favorcard = players[victim].getFavored()
             # print('favorcard', favorcard)
             players[turn].hand[favorcard] += 1 
@@ -64,10 +65,10 @@ def simulateMove(move, players, turn, turnctr, movectr, victim, toDraw, deck):
     elif(move==6):
         players[turn].inform(turn,6,deck[:-4:-1])
     elif(move>=7):
-        if(turn==0 and players[1].hand[1]>0):
-            players[1].hand[1] -= 1;
-            players[1].numCards -= 1;
-        else:
+        # if(turn==0 and players[1].hand[1]>0):
+        #     players[1].hand[1] -= 1;
+        #     players[1].numCards -= 1;
+        # else:
             cardtaken = random.choices([0,1,2,3,4,5,6,7,8,9,10,11], weights=players[victim].hand, k=1)[0]
             players[victim].hand[cardtaken] -= 1
             players[victim].numCards -= 1
@@ -79,15 +80,17 @@ def simulateMove(move, players, turn, turnctr, movectr, victim, toDraw, deck):
         nextcard = deck.pop()
         print('nextcard', nextcard)
         safe = players[turn].cardDrawn(nextcard)
+        print('issafe', safe, type(safe))
         movectr += 1
-        if(not safe): return (players, turn, turnctr, movectr, victim, toDraw, deck, turn^1)
+        if(safe==0): print('notsafereturn'); return (players, turn, turnctr, movectr, victim, toDraw, deck, turn^1)
         else:
             if(safe==1): 
                 if(not deck): deck = [-1]
                 else:
+                    print('from game run toDraw',toDraw,'turn', turn)
                     deck.insert(players[turn].reinsertEK(len(deck)),-1)
             toDraw -= 1
-            if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
+            if(toDraw <= 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
     return (players, turn, turnctr, movectr, victim, toDraw, deck, False)
 
 def processMove(move, players, turn, turnctr, movectr, victim, toDraw, deck):

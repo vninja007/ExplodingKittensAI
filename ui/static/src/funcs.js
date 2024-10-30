@@ -32,6 +32,8 @@ function imageClicked(imageId) {
                 document.getElementById("deadindicator").innerHTML =
                     "Game Not Over";
             }
+            document.getElementById("toDraw").innerHTML =
+                "ToDraw: " + data["toDraw"];
         })
         .catch((error) => console.error("Error:", error));
 }
