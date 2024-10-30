@@ -1,3 +1,8 @@
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
 h1 {
     color: blue;
 }
@@ -13,6 +18,21 @@ h1 {
 #c1 {
     height: 100%;
     width: 22vw;
+    display: flex;
+    flex-direction: column;
+}
+h1 {
+    width: 100%;
+    font-size: 2vw;
+}
+#transcriptlabel {
+    align-self: center;
+    border: 0;
+    padding: 0;
+    text-align: center;
+}
+#transcript {
+    flex-grow: 1;
 }
 #c2 {
     height: 100%;
@@ -38,7 +58,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 150px;
+    gap: min(10vw, 150px);
 }
 
 .aigridflex {
