@@ -19,25 +19,31 @@ playerhand = players[0].hand
 print(playerhand)
 print(deck)
 
+discardhistory = ""
+
+
 @app.route("/")
 def homepage():
     return render_template("index.html", legalmoves = playerhand, decklen = decklen, enumerate=enumerate,aicardcount = sum(players[1].hand))
 
 @app.route('/image_clicked/<int:image_id>')
 def image_clicked(image_id):
-    global decklen, playerhand, players, turn, turnctr, movectr, victim, toDraw, deck, isOver
+    global decklen, playerhand, players, turn, turnctr, movectr, victim, toDraw, deck, isOver, discardhistory
     if(type(isOver)==bool):
         # print(image_id, turn)
         print('deck before human', deck)
         if(2 <= image_id <= 6 and playerhand[image_id] >= 1):
             # playerhand[image_id] -= 1
+            discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{image_id}.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(image_id, players, turn, turnctr, movectr, victim, toDraw, deck)
         elif(7 <= image_id <= 11 and playerhand[image_id] >= 2):
             # playerhand[image_id] -= 2
+            discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{image_id}.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(image_id, players, turn, turnctr, movectr, victim, toDraw, deck)
         # print
         elif(image_id==100):
             # decklen -= 1
+            discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/back.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(0, players, turn, turnctr, movectr, victim, toDraw, deck)
         playerhand = players[0].hand
         
@@ -46,13 +52,16 @@ def image_clicked(image_id):
             print('turnis', turn, 'isover', isOver)
             while(turn == 1 and type(isOver)==bool): #definite winner
                 aimove = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards]) or 0
+                aimove_ = aimove if aimove else 'back'
+                discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{aimove_}.jpg" alt="Discard" />   <p>AI</p> </div>' + discardhistory
                 print('aiplay', aimove, 'deck before', deck)
                 players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(aimove, players, turn, turnctr, movectr, victim, toDraw, deck)
                 
                 print('isover after ai', isOver)
         # print(isOver)
 
-    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)})
+
+    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)} | {'discardhistory': discardhistory})
     
     
     

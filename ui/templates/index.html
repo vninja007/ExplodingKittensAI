@@ -14,8 +14,16 @@
         <div id="maingrid">
             <div id="c1">
                 <img src="./static/imgs/mainlogo.png" id="logoimg" />
-                <h1 id="transcriptlabel">Game Transcript:</h1>
-                <div id="transcript">a</div>
+                <div id="transcriptwhole">
+                    <h1 id="transcriptlabel">Game Transcript:</h1>
+                    <div id="transcript">
+                        <ul>
+                            {% for i in range(100) %}
+                            <li>hi</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
             </div>
             <div id="c2">
                 <div class="aigridflex">
@@ -35,6 +43,7 @@
                 </div>
                 <div class="deckgridflex">
                     <div class="deckstack">
+                        <h1 class="decklabel">Deck</h1>
                         <div class="cardstack-container">
                             <img
                                 id="deckimg"
@@ -47,13 +56,13 @@
                         </div>
                     </div>
                     <div class="discardstack">
-                        <div class="cardstack-container">
+                        <!-- <div class="cardstack-container">
                             <img
                                 id="discardimg"
                                 src="./static/imgs/back.jpg"
                                 alt="Discard"
                             />
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="cardgridflex">
@@ -81,6 +90,7 @@
                 <h1 class="c3item" id="turnis">Player: Human</h1>
                 <h1 class="c3item" id="deadindicator"></h1>
                 <h1 class="c3item" id="toDraw"></h1>
+                <div class="discardscroll" id="discardscroll"></div>
             </div>
         </div>
 
