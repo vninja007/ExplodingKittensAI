@@ -79,6 +79,7 @@ h1 {
     overflow-y: auto;
     white-space: nowrap;
     height: 100%;
+    color: #fcf8ee;
 }
 #c2 {
     height: 100%;
@@ -113,7 +114,7 @@ h1 {
     justify-content: center;
     align-items: center;
     /* gap: min(10vw, 150px); */
-    gap: 30vw;
+    gap: 100px;
 }
 
 .aigridflex {
@@ -154,14 +155,15 @@ h1 {
 }
 
 .aistack img {
-    width: 100%;
+    width: 75px;
     height: 100%;
     transition: box-shadow 0.3s ease;
 }
 
 .aistack {
-    width: 75px;
+    /* width: 75px; */
     height: 110px;
+    display: flex;
 }
 
 .cardgridflex {
@@ -252,4 +254,46 @@ h1 {
 
 .decklabel {
     margin-right: 1vw;
+}
+
+.futuresee {
+    display: flex;
+    align-items: center;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 20px solid #b81c27;
+}
+
+.thefuture {
+    background-color: #b81c27;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-left: -5px;
+    display: flex;
+    gap: 20px;
+}
+
+/* .thefutureimg {
+    width: 75px;
+    height: 110px;
+} */
+
+.thefutureimg img {
+    width: 75px;
+    height: 110px;
+}
+
+.unseen {
+    display: none;
+}
+
+.futurelabel {
+    display: flex;
+    justify-content: center;
 }

@@ -21,6 +21,11 @@ print(deck)
 
 discardhistory = ""
 
+movehistory = ""
+
+#             0           1          2         3         4            5            6                 7                8                9                           10                    11                -1
+cardmap = ['Defuse', 'Nope', 'Attack', 'Skip', 'Favor', 'Shuffle', 'See The Future', 'Beard Cat', 'Cattermelon', 'Hairy Potato Cat', 'Rainbow-ralphing Cat', 'Tacocat', 'EXPLODING KITTEN']
+
 
 @app.route("/")
 def homepage():
@@ -28,22 +33,25 @@ def homepage():
 
 @app.route('/image_clicked/<int:image_id>')
 def image_clicked(image_id):
-    global decklen, playerhand, players, turn, turnctr, movectr, victim, toDraw, deck, isOver, discardhistory
+    global decklen, playerhand, players, turn, turnctr, movectr, victim, toDraw, deck, isOver, discardhistory, movehistory, carmdap
     if(type(isOver)==bool):
         # print(image_id, turn)
         print('deck before human', deck)
         if(2 <= image_id <= 6 and playerhand[image_id] >= 1):
             # playerhand[image_id] -= 1
             discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{image_id}.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
+            movehistory += f'<li>Human plays {cardmap[image_id]}!</li>'
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(image_id, players, turn, turnctr, movectr, victim, toDraw, deck)
         elif(7 <= image_id <= 11 and playerhand[image_id] >= 2):
             # playerhand[image_id] -= 2
             discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{image_id}.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
+            movehistory += f'<li>Human plays {cardmap[image_id]}!</li>'
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(image_id, players, turn, turnctr, movectr, victim, toDraw, deck)
         # print
         elif(image_id==100):
             # decklen -= 1
             discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/back.jpg" alt="Discard" />   <p>Human</p> </div>' + discardhistory
+            movehistory += f'<li>Human draws a {cardmap[deck[-1]]} card!</li>'
             players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(0, players, turn, turnctr, movectr, victim, toDraw, deck)
         playerhand = players[0].hand
         
@@ -54,6 +62,11 @@ def image_clicked(image_id):
                 aimove = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards]) or 0
                 aimove_ = aimove if aimove else 'back'
                 discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{aimove_}.jpg" alt="Discard" />   <p>AI</p> </div>' + discardhistory
+                if(aimove):
+                    movehistory += f'<li>AI plays {cardmap[image_id]}!</li>'
+                else:
+                    movehistory += f'<li>AI draws a card!</li>'
+            
                 print('aiplay', aimove, 'deck before', deck)
                 players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(aimove, players, turn, turnctr, movectr, victim, toDraw, deck)
                 
@@ -61,7 +74,7 @@ def image_clicked(image_id):
         # print(isOver)
 
 
-    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)} | {'discardhistory': discardhistory})
+    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)} | {'discardhistory': discardhistory} | {'movehistory': movehistory})
     
     
     

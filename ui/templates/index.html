@@ -16,18 +16,15 @@
                 <img src="./static/imgs/mainlogo.png" id="logoimg" />
                 <div id="transcriptwhole">
                     <h1 id="transcriptlabel">Game Transcript:</h1>
-                    <div id="transcript">
-                        <ul>
-                            {% for i in range(100) %}
-                            <li>hi</li>
-                            {% endfor %}
-                        </ul>
+                    <div id="transcript" x>
+                        <ul id="transcriptlist"></ul>
                     </div>
                 </div>
             </div>
             <div id="c2">
                 <div class="aigridflex">
                     <div class="aistack">
+                        <h1 class="decklabel">AI's Hand</h1>
                         <div class="cardstack-container">
                             <img
                                 id="aicardstackimg"
@@ -55,14 +52,22 @@
                             <div class="circle" id="deckcount">{{decklen}}</div>
                         </div>
                     </div>
-                    <div class="discardstack">
-                        <!-- <div class="cardstack-container">
-                            <img
-                                id="discardimg"
-                                src="./static/imgs/back.jpg"
-                                alt="Discard"
-                            />
-                        </div> -->
+                    <div class="futuresee">
+                        <div class="triangle"></div>
+                        <div class="thefuture">
+                            <div class="thefutureimg" id="futureimg1">
+                                <img src="./static/imgs/7.jpg" alt="Future1" />
+                                <p class="futurelabel">Top</p>
+                            </div>
+                            <div class="thefutureimg" id="futureimg2">
+                                <img src="./static/imgs/8.jpg" alt="Future2" />
+                                <p class="futurelabel">2nd</p>
+                            </div>
+                            <div class="thefutureimg" id="futureimg3">
+                                <img src="./static/imgs/9.jpg" alt="Future3" />
+                                <p class="futurelabel">3rd</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="cardgridflex">

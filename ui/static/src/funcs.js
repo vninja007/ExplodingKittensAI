@@ -38,6 +38,21 @@ function imageClicked(imageId) {
                 data["aicardcount"];
             document.getElementById("discardscroll").innerHTML =
                 data["discardhistory"];
+            document.getElementById("transcriptlist").innerHTML =
+                data["movehistory"];
+            // alert(data["movehistory"]);
+            document.getElementById("futureimg1").innerHTML =
+                '<img src="./static/imgs/' +
+                data["card1"] +
+                '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
+            document.getElementById("futureimg2").innerHTML =
+                '<img src="./static/imgs/' +
+                data["card2"] +
+                '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
+            document.getElementById("futureimg3").innerHTML =
+                '<img src="./static/imgs/' +
+                data["card3"] +
+                '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
         })
         .catch((error) => console.error("Error:", error));
 }
