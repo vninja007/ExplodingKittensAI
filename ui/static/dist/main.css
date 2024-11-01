@@ -256,7 +256,7 @@ h1 {
     margin-right: 1vw;
 }
 
-.futuresee {
+#futuresee {
     display: flex;
     align-items: center;
 }
@@ -290,7 +290,8 @@ h1 {
 }
 
 .unseen {
-    display: none;
+    /* display: none !important; */
+    opacity: 0;
 }
 
 .futurelabel {

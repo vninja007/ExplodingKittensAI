@@ -62,10 +62,14 @@ def image_clicked(image_id):
                 aimove = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards]) or 0
                 aimove_ = aimove if aimove else 'back'
                 discardhistory = f'<div class="discardscrolimg"> <img src="./static/imgs/{aimove_}.jpg" alt="Discard" />   <p>AI</p> </div>' + discardhistory
+                # print('aimove', aimove)
                 if(aimove):
-                    movehistory += f'<li>AI plays {cardmap[image_id]}!</li>'
+                    movehistory += f'<li>AI plays {cardmap[aimove]}!</li>'
                 else:
-                    movehistory += f'<li>AI draws a card!</li>'
+                    if(deck[-1] == -1):
+                        movehistory += f'<li>AI draws an EXPLODING KITTEN card</li>'
+                    else:
+                        movehistory += f'<li>AI draws a card!</li>'
             
                 print('aiplay', aimove, 'deck before', deck)
                 players, turn, turnctr, movectr, victim, toDraw, deck, isOver = processMove(aimove, players, turn, turnctr, movectr, victim, toDraw, deck)
@@ -74,7 +78,7 @@ def image_clicked(image_id):
         # print(isOver)
 
 
-    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)} | {'discardhistory': discardhistory} | {'movehistory': movehistory})
+    return jsonify({f'card{i}':playerhand[i] for i in range(12)} | {'decklen': len(deck)} | {'turn': turn} | {'isOver': isOver} |{'toDraw': toDraw} | {'aicardcount': sum(players[1].hand)} | {'discardhistory': discardhistory} | {'movehistory': movehistory} | {'cardplayed': image_id, 'deck': deck})
     
     
     

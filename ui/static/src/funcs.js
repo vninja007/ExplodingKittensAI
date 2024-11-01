@@ -43,16 +43,30 @@ function imageClicked(imageId) {
             // alert(data["movehistory"]);
             document.getElementById("futureimg1").innerHTML =
                 '<img src="./static/imgs/' +
-                data["card1"] +
+                data["deck"][data["deck"].length - 1] +
                 '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
-            document.getElementById("futureimg2").innerHTML =
-                '<img src="./static/imgs/' +
-                data["card2"] +
-                '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
-            document.getElementById("futureimg3").innerHTML =
-                '<img src="./static/imgs/' +
-                data["card3"] +
-                '.jpg" alt="Future1" /> <p class="futurelabel">Top</p>';
+            if (data["deck"].length >= 2) {
+                document.getElementById("futureimg2").innerHTML =
+                    '<img src="./static/imgs/' +
+                    data["deck"][data["deck"].length - 2] +
+                    '.jpg" alt="Future1" /> <p class="futurelabel">2nd</p>';
+            } else {
+                document.getElementById("futureimg2").innerHTML = "";
+            }
+            if (data["deck"].length >= 3) {
+                document.getElementById("futureimg3").innerHTML =
+                    '<img src="./static/imgs/' +
+                    data["deck"][data["deck"].length - 3] +
+                    '.jpg" alt="Future1" /> <p class="futurelabel">3rd</p>';
+            } else {
+                document.getElementById("futureimg3").innerHTML = "";
+            }
+
+            if (data["cardplayed"] == 6) {
+                document.getElementById("futuresee").classList.remove("unseen");
+            } else {
+                document.getElementById("futuresee").classList.add("unseen");
+            }
         })
         .catch((error) => console.error("Error:", error));
 }
