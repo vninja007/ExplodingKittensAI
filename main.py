@@ -55,10 +55,12 @@ def simulateGame(PLAYERS):
     movectr = 0 # Number of ATK + SKIP + Cards Drawn
     victim = 1
     toDraw = 1
+    isLastCardDuel = False
     while toDraw and len(players)>1:
         # print(len(deck))
         # input()
         move = 'skibidi'
+        if(len(deck)) == 1: isLastCardDuel = True
         while move:
             move = players[turn].getMove(toDraw, movectr, turnctr, [players[0].numCards, players[1].numCards])
             # print(turn, move)
@@ -136,7 +138,7 @@ def simulateGame(PLAYERS):
                     deck.insert(players[turn].reinsertEK(len(deck)),-1)
             toDraw -= 1
             if(toDraw == 0): turn += 1; turn %= PLAYERS; toDraw = 1; turnctr += 1
-    # return 
+    return players[0].name, isLastCardDuel
 # print(players[0].hand)
 # print("Player",players[0].name,"won by",players[0].hand.count('DEF'),'defuses')
 # print(players[0].getMove())
@@ -145,16 +147,15 @@ wfile = open('results_SPAM2.txt','a+')
 if __name__ == '__main__':
     onewin = 0
     zerowin = 0
-    lastloss = 0
-    sum0 = 0
-    for _ in range(int(1e4)):
-        res, numcards,finalhand = simulateGame(2)
-        if(not res and numcards<=0): sum0 += 1
-        if(not res):
-                wfile.write(str(finalhand)+'\n')
+    lcd = 0
+    for _ in range(int(1e5)):
+        res, isLastCardDuel = simulateGame(2)
         # print(res)
+        lcd += isLastCardDuel
         if(res==1): onewin += 1
         else: zerowin += 1
 
-    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin), sum0/zerowin)
+    print(zerowin, onewin, zerowin/(onewin+zerowin), onewin/(onewin+zerowin))
+    print('LastCardDuel:', lcd, lcd/(zerowin+onewin))
+
     print(time.time()-ctic)
