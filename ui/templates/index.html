@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {% assets 'css' %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}" />
+        {% endassets %}
+        <script src="./static/src/funcs.js"></script>
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="maingrid">
+            <div id="c1">
+                <img src="./static/imgs/mainlogo.png" id="logoimg" />
+                <div id="transcriptwhole">
+                    <h1 id="transcriptlabel">Game Transcript:</h1>
+                    <div id="transcript" x>
+                        <ul id="transcriptlist"></ul>
+                    </div>
+                </div>
+            </div>
+            <div id="c2">
+                <div class="aigridflex">
+                    <div class="aistack">
+                        <h1 class="decklabel">AI's Hand</h1>
+                        <div class="cardstack-container">
+                            <img
+                                id="aicardstackimg"
+                                src="./static/imgs/back.jpg"
+                                alt="Deck"
+                            />
+
+                            <div class="circle" id="aicardcount">
+                                {{aicardcount}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="deckgridflex">
+                    <div class="deckstack">
+                        <h1 class="decklabel">Deck</h1>
+                        <div class="cardstack-container">
+                            <img
+                                id="deckimg"
+                                src="./static/imgs/back.jpg"
+                                onclick="imageClicked(100)"
+                                alt="Deck"
+                            />
+
+                            <div class="circle" id="deckcount">{{decklen}}</div>
+                        </div>
+                    </div>
+                    <div id="futuresee" class="unseen">
+                        <div class="triangle"></div>
+                        <div class="thefuture">
+                            <div class="thefutureimg" id="futureimg1">
+                                <img src="./static/imgs/7.jpg" alt="Future1" />
+                                <p class="futurelabel">Top</p>
+                            </div>
+                            <div class="thefutureimg" id="futureimg2">
+                                <img src="./static/imgs/8.jpg" alt="Future2" />
+                                <p class="futurelabel">2nd</p>
+                            </div>
+                            <div class="thefutureimg" id="futureimg3">
+                                <img src="./static/imgs/9.jpg" alt="Future3" />
+                                <p class="futurelabel">3rd</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cardgridflex">
+                    <div class="cardgrid">
+                        {% for i, cardcount in enumerate(legalmoves) %}
+                        <div class="cardstack">
+                            <div class="cardstack-container">
+                                <img
+                                    id="card{{ i }}img"
+                                    src="./static/imgs/{{ i }}.jpg"
+                                    onclick="imageClicked({{ i }})"
+                                    alt="Defuse"
+                                />
+
+                                <div class="circle" id="card{{ i }}count">
+                                    {{ cardcount }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="c3">
+                <h1 class="c3item" id="turnis">Player: Human</h1>
+                <h1 class="c3item" id="deadindicator"></h1>
+                <h1 class="c3item" id="toDraw"></h1>
+                <div class="discardscroll" id="discardscroll"></div>
+            </div>
+        </div>
+
+        <script>
+            window.onload = function () {
+                imageClicked(999);
+            };
+        </script>
+    </body>
+</html>
